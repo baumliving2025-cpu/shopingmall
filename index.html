@@ -1,24 +1,1932 @@
-<!DOCTYPE html>
-<html>
+        // Login modal
+        function toggleLogin() {
+            if (currentUser) {
+                // Show user info if logged in
+                showUserInfo();
+            } else {
+                document.getElementById('login<!DOCTYPE html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>주문 알림</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernShop - 프리미엄 쇼핑몰</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="http://localhost:3000/api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+
+        /* Header Styles */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #3498db;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            width: 300px;
+        }
+
+        .search-container input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            padding: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .header-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-btn {
+            background: #fff;
+            color: #667eea;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .category-image {
+            height: 200px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .category-info {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .category-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        /* Featured Products */
+        .featured-products {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+        }
+
+        .products-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            height: 250px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #2980b9;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            border-top: 1px solid #34495e;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            color: #95a5a6;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #3498db;
+        }
+    </style>
 </head>
 <body>
-    <h2>새로운 주문이 접수되었습니다!</h2>
-    
-    <h3>주문 정보</h3>
-    <p><strong>주문번호:</strong> {{order_number}}</p>
-    <p><strong>주문일자:</strong> {{order_date}}</p>
-    <p><strong>고객명:</strong> {{customer_name}}</p>
-    <p><strong>주문시간:</strong> {{order_time}}</p>
-    
-    <h3>주문 상품</h3>
-    <pre>{{order_items}}</pre>
-    
-    <h3>총 결제금액</h3>
-    <p><strong>{{total_amount}}원</strong></p>
-    
-    <p>고객센터: 1588-0000</p>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="#" class="logo">ModernShop</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" onclick="showProducts('전체')">전체상품</a></li>
+                    <li><a href="#" onclick="showProducts('패션')">패션</a></li>
+                    <li><a href="#" onclick="showProducts('전자제품')">전자제품</a></li>
+                    <li><a href="#" onclick="showProducts('뷰티')">뷰티</a></li>
+                    <li><a href="#" onclick="showProducts('홈&리빙')">홈&리빙</a></li>
+                </ul>
+            </nav>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="검색어를 입력하세요...">
+                <i class="fas fa-search" style="color: #666; cursor: pointer;" onclick="search()"></i>
+            </div>
+
+            <div class="header-actions">
+                <button class="header-btn" onclick="toggleLogin()" id="loginBtn">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="header-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+                <button class="header-btn" onclick="showOrderHistory()" title="주문내역">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="header-btn" onclick="showAddProduct()" id="addProductBtn" style="display: none;" title="상품등록">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="header-btn" onclick="showAdminPanel()" id="adminBtn" style="display: none;" title="관리자패널">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="header-btn" onclick="logout()" id="logoutBtn" style="display: none;" title="로그아웃">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Banner -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1>프리미엄 쇼핑의 새로운 경험</h1>
+            <p>최고 품질의 상품들을 특별한 가격으로 만나보세요</p>
+            <button class="cta-btn" onclick="scrollToProducts()">지금 쇼핑하기</button>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <h2 class="section-title">카테고리</h2>
+        <div class="category-grid">
+            <div class="category-card" onclick="showProducts('패션')">
+                <div class="category-image">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="category-info">
+                    <h3>패션</h3>
+                    <p>최신 트렌드의 의류와 액세서리</p>
+                </div>
+            </div>
+            
+            <div class="category-card" onclick="showProducts('전자제품')">
+                <div class="category-image">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <div class="category-info">
+                    <h3>전자제품</h3>
+                    <p>혁신적인 기술의 전자제품</p>
+                </div>
+            </div>
+            
+            <div class="category-card" onclick="showProducts('뷰티')">
+                <div class="category-image">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="category-info">
+                    <h3>뷰티</h3>
+                    <p>프리미엄 화장품과 스킨케어</p>
+                </div>
+            </div>
+            
+            <div class="category-card" onclick="showProducts('홈&리빙')">
+                <div class="category-image">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="category-info">
+                    <h3>홈&리빙</h3>
+                    <p>편안한 생활을 위한 홈 인테리어</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="featured-products" id="productsSection">
+        <div class="products-container">
+            <h2 class="section-title">추천 상품</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>회사정보</h3>
+                <ul>
+                    <li><a href="#">회사소개</a></li>
+                    <li><a href="#">채용정보</a></li>
+                    <li><a href="#">이용약관</a></li>
+                    <li><a href="#">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>고객센터</h3>
+                <ul>
+                    <li><a href="#">1588-0000</a></li>
+                    <li><a href="#">help@modernshop.com</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">1:1 문의</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>배송/교환/반품</h3>
+                <ul>
+                    <li><a href="#">배송조회</a></li>
+                    <li><a href="#">교환/반품 안내</a></li>
+                    <li><a href="#">배송비 안내</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>소셜미디어</h3>
+                <ul>
+                    <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 ModernShop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddProduct()">&times;</span>
+            <h2>상품 등록</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label>상품명</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>가격</label>
+                    <input type="number" id="productPrice" required>
+                </div>
+                <div class="form-group">
+                    <label>브랜드</label>
+                    <input type="text" id="productBrand" required placeholder="예: Nike, Apple, Samsung">
+                </div>
+                <div class="form-group">
+                    <label>카테고리</label>
+                    <select id="productCategory" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                        <option value="패션">패션</option>
+                        <option value="전자제품">전자제품</option>
+                        <option value="뷰티">뷰티</option>
+                        <option value="홈&리빙">홈&리빙</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>상품 설명</label>
+                    <textarea id="productDescription" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; height: 100px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>상품 이미지</label>
+                    <input type="file" id="productImages" multiple accept="image/*" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                    <small style="color: #666; font-size: 0.8rem;">최대 10개 이미지, 각 파일 최대 5MB (JPEG, PNG, GIF, WebP)</small>
+                </div>
+                <div class="form-group">
+                    <label>재고 수량</label>
+                    <input type="number" id="productStock" min="0" value="0" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="form-group">
+                    <label>상품 무게 (kg)</label>
+                    <input type="number" id="productWeight" step="0.1" min="0" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="form-group">
+                    <label>상품 크기 (가로x세로x높이)</label>
+                    <input type="text" id="productDimensions" placeholder="예: 30x20x10" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="form-group">
+                    <label>상품 태그 (쉼표로 구분)</label>
+                    <input type="text" id="productTags" placeholder="예: 운동화, 나이키, 스니커즈" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productFeatured" style="margin-right: 0.5rem;">
+                        추천 상품으로 설정
+                    </label>
+                </div>
+                <button type="submit" class="cta-btn" style="width: 100%; margin-top: 1rem;">상품 등록</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>장바구니</h2>
+            <div id="cartItems">
+                <!-- Cart items will be displayed here -->
+            </div>
+            <div style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
+                <h3 id="totalPrice">총 금액: 0원</h3>
+                <button class="cta-btn" style="width: 100%; margin-top: 1rem;" onclick="checkout()">주문하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLogin()">&times;</span>
+            <div id="loginContent">
+                <h2>로그인</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>이메일</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="cta-btn" style="width: 100%;">로그인</button>
+                </form>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p>계정이 없으신가요? <a href="#" onclick="showSignup()" style="color: #3498db;">회원가입</a></p>
+                </div>
+            </div>
+            
+            <div id="signupContent" style="display: none;">
+                <h2>회원가입</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label>이름</label>
+                        <input type="text" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>이메일</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호</label>
+                        <input type="password" id="signupPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호 확인</label>
+                        <input type="password" id="signupPasswordConfirm" required minlength="6">
+                    </div>
+                    <button type="submit" class="cta-btn" style="width: 100%;">가입 신청</button>
+                </form>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p>이미 계정이 있으신가요? <a href="#" onclick="showLogin()" style="color: #3498db;">로그인</a></p>
+                </div>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                    <i class="fas fa-info-circle" style="color: #e17055;"></i>
+                    <small style="color: #6c5ce7;">회원가입 후 관리자 승인이 완료되면 로그인할 수 있습니다.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close" onclick="closeAdminPanel()">&times;</span>
+            <h2>관리자 패널</h2>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="cta-btn" onclick="showPendingUsers()" style="background: #000; color: #fff;">
+                    대기중인 회원 (<span id="pendingCount">0</span>)
+                </button>
+                <button class="cta-btn" onclick="showAllUsers()" style="background: #000; color: #fff;">
+                    전체 회원 관리
+                </button>
+                <button class="cta-btn" onclick="showAdminOrders()" style="background: #000; color: #fff;">
+                    주문 관리
+                </button>
+            </div>
+            
+            <div id="adminContent">
+                <!-- Admin content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let products = [];
+        let cart = [];
+        let orders = [];
+        const ORDER_STATUSES = ['주문접수', '처리중', '배송중', '완료'];
+        const companyProfile = {
+            name: 'ModernShop Inc.',
+            bizNumber: '123-45-67890',
+            tel: '1588-0000',
+            email: 'help@modernshop.com',
+            address: '서울특별시 강남구 테크로 100',
+            logoText: 'ModernShop'
+        };
+        let users = [
+            {
+                id: 1,
+                email: 'admin@modernshop.com',
+                password: 'admin123',
+                name: '관리자',
+                role: 'admin',
+                status: 'approved',
+                joinDate: '2025-01-01'
+            }
+        ];
+        let currentUser = null;
+        let pendingUsers = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            updateCartBadge();
+            loadOrders();
+            initEmailJS(); // EmailJS 초기화
+            // checkLoginStatus will be called after all functions are defined
+        });
+
+        // Product management
+        function loadProducts() {
+            // Sample brand products
+            if (products.length === 0) {
+                products = [
+                    {
+                        id: 1,
+                        name: "Nike Air Max 270",
+                        price: 159000,
+                        category: "패션",
+                        brand: "Nike",
+                        description: "편안함과 스타일을 모두 갖춘 나이키 에어맥스",
+                        badge: "BEST"
+                    },
+                    {
+                        id: 2,
+                        name: "Dyson V15 무선청소기",
+                        price: 890000,
+                        category: "전자제품",
+                        brand: "Dyson",
+                        description: "강력한 흡입력의 프리미엄 무선청소기",
+                        badge: "NEW"
+                    },
+                    {
+                        id: 3,
+                        name: "Chanel No.5 Parfum",
+                        price: 245000,
+                        category: "뷰티",
+                        brand: "Chanel",
+                        description: "전 세계가 사랑하는 클래식 향수",
+                        badge: "HOT"
+                    },
+                    {
+                        id: 4,
+                        name: "Herman Miller Aeron Chair",
+                        price: 1850000,
+                        category: "홈&리빙",
+                        brand: "Herman Miller",
+                        description: "인체공학적 설계의 프리미엄 사무용 의자"
+                    },
+                    {
+                        id: 5,
+                        name: "Adidas Ultraboost 22",
+                        price: 189000,
+                        category: "패션",
+                        brand: "Adidas",
+                        description: "최고의 러닝 퍼포먼스를 위한 운동화",
+                        badge: "NEW"
+                    },
+                    {
+                        id: 6,
+                        name: "Apple iPhone 15 Pro",
+                        price: 1350000,
+                        category: "전자제품",
+                        brand: "Apple",
+                        description: "티타늄 디자인의 프로 스마트폰"
+                    }
+                ];
+            }
+            displayProducts();
+        }
+
+        function displayProducts(filter = '전체') {
+            const grid = document.getElementById('productsGrid');
+            let filteredProducts = filter === '전체' ? products : products.filter(p => p.category === filter);
+            
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-image"></i>
+                        ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+                    </div>
+                    <div class="product-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 class="product-title">${product.name}</h3>
+                            <span style="font-size: 0.8rem; background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 10px; color: #666;">${product.brand}</span>
+                        </div>
+                        <div class="product-price">${product.price.toLocaleString()}원</div>
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${product.description}</p>
+                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})" ${!currentUser ? 'disabled title="로그인이 필요합니다"' : ''}>
+                            <i class="fas fa-shopping-cart"></i> 장바구니 담기
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showProducts(category) {
+            displayProducts(category);
+            scrollToProducts();
+        }
+
+        function scrollToProducts() {
+            document.getElementById('productsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Add product functionality
+        function showAddProduct() {
+            document.getElementById('addProductModal').style.display = 'block';
+        }
+
+        function closeAddProduct() {
+            document.getElementById('addProductModal').style.display = 'none';
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('관리자만 상품을 등록할 수 있습니다.');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = showLoading(submitBtn, '등록 중...');
+            
+            try {
+                // 카테고리 ID 찾기
+                const categoryName = document.getElementById('productCategory').value;
+                const category = categories.find(c => c.name === categoryName);
+                if (!category) {
+                    throw new Error('유효하지 않은 카테고리입니다.');
+                }
+                
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    original_price: document.getElementById('productOriginalPrice')?.value || null,
+                    brand: document.getElementById('productBrand').value,
+                    category_id: category.id,
+                    description: document.getElementById('productDescription').value,
+                    stock_quantity: parseInt(document.getElementById('productStock').value) || 0,
+                    weight: parseFloat(document.getElementById('productWeight').value) || null,
+                    dimensions: document.getElementById('productDimensions').value || null,
+                    tags: document.getElementById('productTags').value ? 
+                        document.getElementById('productTags').value.split(',').map(tag => tag.trim()) : null,
+                    is_featured: document.getElementById('productFeatured').checked,
+                    badge: 'NEW'
+                };
+
+                // 이미지 파일 가져오기
+                const imageFiles = document.getElementById('productImages').files;
+                const images = Array.from(imageFiles);
+
+                const success = await addProduct(productData, images);
+                
+                if (success) {
+                    closeAddProduct();
+                    document.getElementById('addProductForm').reset();
+                }
+            } catch (error) {
+                handleAPIError(error, '상품 등록에 실패했습니다.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Cart functionality
+        function addToCart(productId) {
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                toggleLogin();
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartBadge();
+            showCartNotification();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            displayCart();
+            updateCartBadge();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                    return;
+                }
+                displayCart();
+                updateCartBadge();
+            }
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+        }
+
+        function toggleCart() {
+            document.getElementById('cartModal').style.display = 'block';
+            displayCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function displayCart() {
+            const cartItems = document.getElementById('cartItems');
+            const totalPrice = document.getElementById('totalPrice');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">장바구니가 비어있습니다.</p>';
+                totalPrice.textContent = '총 금액: 0원';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div style="display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
+                    <div style="flex: 1;">
+                        <h4>${item.name}</h4>
+                        <p style="color: #666;">${item.price.toLocaleString()}원</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button onclick="updateQuantity(${item.id}, -1)" style="background: #f8f9fa; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" style="background: #f8f9fa; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">+</button>
+                        <button onclick="removeFromCart(${item.id})" style="background: #e74c3c; color: white; border: none; padding: 0.5rem; border-radius: 5px; cursor: pointer;">삭제</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPrice.textContent = `총 금액: ${total.toLocaleString()}원`;
+        }
+
+        function showCartNotification() {
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = '<i class="fas fa-check"></i> 상품이 장바구니에 추가되었습니다!';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // Checkout functionality
+        function checkout() {
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                closeCart();
+                toggleLogin();
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('장바구니가 비어있습니다.');
+                return;
+            }
+
+            // Generate random order number
+            const orderNumber = 'ORD' + Date.now() + Math.floor(Math.random() * 1000);
+            const orderDate = new Date().toLocaleDateString('ko-KR');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            const order = {
+                orderNumber,
+                date: orderDate,
+                items: [...cart],
+                total,
+                status: '주문접수',
+                userId: currentUser.id,
+                userName: currentUser.name
+            };
+
+            orders.push(order);
+            persistOrders();
+            try {
+                generateAndOfferOrderPdf(order);
+            } catch (e) {
+                console.warn('PDF 생성 실패:', e);
+            }
+            try {
+                notifyBusinessNewOrder(order);
+            } catch (e) {
+                console.warn('알림 실패:', e);
+            }
+            
+            // Clear cart
+            cart = [];
+            updateCartBadge();
+            closeCart();
+
+            // Show order confirmation
+            showOrderConfirmation(order);
+        }
+
+        function showOrderConfirmation(order) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align: center;">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <div style="padding: 2rem;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;"></i>
+                        <h2 style="color: #27ae60; margin-bottom: 1rem;">주문이 완료되었습니다!</h2>
+                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
+                            <p><strong>주문번호:</strong> ${order.orderNumber}</p>
+                            <p><strong>주문일자:</strong> ${order.date}</p>
+                            <p><strong>결제금액:</strong> ${order.total.toLocaleString()}원</p>
+                        </div>
+                        <p style="color: #666; margin-bottom: 2rem;">주문 내역은 주문조회에서 확인하실 수 있습니다.</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button class="cta-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">확인</button>
+                            <button class="cta-btn" style="background: #2c3e50;" onclick="reDownloadOrderPdf('${order.orderNumber}')">PDF 다운로드</button>
+                            <button class="cta-btn" style="background: #34495e;" onclick="showOrderHistory()">주문내역 보기</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Order history
+        function showOrderHistory() {
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                toggleLogin();
+                return;
+            }
+
+            // Close any existing modals
+            document.querySelectorAll('.modal').forEach(modal => modal.remove());
+            
+            // Filter orders for current user (admin can see all orders)
+            const userOrders = currentUser.role === 'admin' ? orders : orders.filter(order => order.userId === currentUser.id);
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <h2>${currentUser.role === 'admin' ? '전체 주문 내역' : '나의 주문 내역'}</h2>
+                    <div id="orderHistoryContent">
+                        ${userOrders.length === 0 ? 
+                            '<p style="text-align: center; color: #666; padding: 2rem;">주문 내역이 없습니다.</p>' :
+                            userOrders.map(order => `
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1.5rem; margin: 1rem 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                                        <div>
+                                            <h4>${order.orderNumber}</h4>
+                                            <p style="color: #666; font-size: 0.9rem;">${order.date}</p>
+                                            ${currentUser.role === 'admin' ? `<p style="color: #3498db; font-size: 0.9rem;">주문자: ${order.userName}</p>` : ''}
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">${order.status}</span>
+                                            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                                <button class="cta-btn" style="padding: 0.4rem 0.8rem; background: #2c3e50;" onclick="reDownloadOrderPdf('${order.orderNumber}')">PDF</button>
+                                                ${currentUser.role === 'admin' ? `
+                                                    <select onchange="adminUpdateOrderStatus('${order.orderNumber}', this.value)" style="padding: 0.3rem; border-radius: 6px; border: 1px solid #ccc;">
+                                                        ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s}</option>`).join('')}
+                                                    </select>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 1rem;">
+                                        ${order.items.map(item => `
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                                <span>${item.brand} ${item.name} x ${item.quantity}</span>
+                                                <span>${(item.price * item.quantity).toLocaleString()}원</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div style="text-align: right; font-weight: bold; font-size: 1.1rem; color: #e74c3c;">
+                                        총 금액: ${order.total.toLocaleString()}원
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Search functionality
+        function search() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (query === '') {
+                displayProducts();
+                return;
+            }
+
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(query) || 
+                product.description.toLowerCase().includes(query) ||
+                product.category.toLowerCase().includes(query)
+            );
+
+            const grid = document.getElementById('productsGrid');
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1 / -1; padding: 2rem;">검색 결과가 없습니다.</p>';
+            } else {
+                grid.innerHTML = filteredProducts.map(product => `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-image"></i>
+                            ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.name}</h3>
+                            <div class="product-price">${product.price.toLocaleString()}원</div>
+                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${product.description}</p>
+                            <button class="add-to-cart-btn" onclick="addToCart(${product.id})" ${!currentUser ? 'disabled title="로그인이 필요합니다"' : ''}>
+                                <i class="fas fa-shopping-cart"></i> 장바구니 담기
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            scrollToProducts();
+        }
+
+        // Enter key search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+
+        // Login modal
+        function toggleLogin() {
+            if (currentUser) {
+                // Show user info if logged in
+                showUserInfo();
+            } else {
+                document.getElementById('loginModal').style.display = 'block';
+            }
+        }
+
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // 로그인 폼 이벤트 리스너
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = showLoading(submitBtn, '로그인 중...');
+            
+            try {
+                const success = await loginUser(email, password);
+                if (success) {
+                    closeLogin();
+                }
+            } catch (error) {
+                handleAPIError(error, '로그인에 실패했습니다.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // 회원가입 폼 이벤트 리스너
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+            
+            if (password !== passwordConfirm) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = showLoading(submitBtn, '가입 중...');
+            
+            try {
+                const userData = { name, email, password };
+                const success = await registerUser(userData);
+                if (success) {
+                    showLogin();
+                }
+            } catch (error) {
+                handleAPIError(error, '회원가입에 실패했습니다.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // User management functions
+        function showUserInfo() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align: center;">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <div style="padding: 2rem;">
+                        <i class="fas fa-user-circle" style="font-size: 4rem; color: #3498db; margin-bottom: 1rem;"></i>
+                        <h2>${currentUser.name}님</h2>
+                        <p style="color: #666; margin-bottom: 2rem;">${currentUser.email}</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button class="cta-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">확인</button>
+                            <button class="cta-btn" style="background: #e74c3c;" onclick="logout()">로그아웃</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function logout() {
+            currentUser = null;
+            cart = [];
+            updateCartBadge();
+            updateHeaderButtons();
+            document.querySelectorAll('.modal').forEach(modal => modal.remove());
+            alert('로그아웃되었습니다.');
+        }
+
+        function updateHeaderButtons() {
+            const loginBtn = document.getElementById('loginBtn');
+            const addProductBtn = document.getElementById('addProductBtn');
+            const adminBtn = document.getElementById('adminBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (currentUser) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                
+                if (currentUser.role === 'admin') {
+                    addProductBtn.style.display = 'block';
+                    adminBtn.style.display = 'block';
+                } else {
+                    addProductBtn.style.display = 'none';
+                    adminBtn.style.display = 'none';
+                }
+            } else {
+                loginBtn.style.display = 'block';
+                addProductBtn.style.display = 'none';
+                adminBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        // Modal functions
+        function showSignup() {
+            document.getElementById('loginContent').style.display = 'none';
+            document.getElementById('signupContent').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('signupContent').style.display = 'none';
+            document.getElementById('loginContent').style.display = 'block';
+        }
+
+        // Admin panel functions
+        function showAdminPanel() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('관리자만 접근할 수 있습니다.');
+                return;
+            }
+            document.getElementById('adminModal').style.display = 'block';
+            showPendingUsers();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function showPendingUsers() {
+            const adminContent = document.getElementById('adminContent');
+            const pendingCount = document.getElementById('pendingCount');
+            
+            pendingCount.textContent = pendingUsers.length;
+            
+            if (pendingUsers.length === 0) {
+                adminContent.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">대기중인 회원이 없습니다.</p>';
+                return;
+            }
+
+            adminContent.innerHTML = `
+                <h3>대기중인 회원 목록</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    ${pendingUsers.map(user => `
+                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4>${user.name}</h4>
+                                <p style="color: #666; font-size: 0.9rem;">${user.email}</p>
+                                <p style="color: #666; font-size: 0.8rem;">가입일: ${user.joinDate}</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="cta-btn" style="background: #27ae60; padding: 0.5rem 1rem;" onclick="approveUser(${user.id})">승인</button>
+                                <button class="cta-btn" style="background: #e74c3c; padding: 0.5rem 1rem;" onclick="rejectUser(${user.id})">거부</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showAllUsers() {
+            const adminContent = document.getElementById('adminContent');
+            const allUsers = users.filter(user => user.status === 'approved');
+            
+            adminContent.innerHTML = `
+                <h3>전체 회원 목록</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    ${allUsers.map(user => `
+                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4>${user.name} ${user.role === 'admin' ? '(관리자)' : ''}</h4>
+                                    <p style="color: #666; font-size: 0.9rem;">${user.email}</p>
+                                    <p style="color: #666; font-size: 0.8rem;">가입일: ${user.joinDate}</p>
+                                </div>
+                                <div>
+                                    <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">승인됨</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Admin Orders Management
+        function showAdminOrders() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('관리자만 접근할 수 있습니다.');
+                return;
+            }
+            const adminContent = document.getElementById('adminContent');
+            const uniqueUsers = [...new Set(orders.map(o => o.userName))];
+            adminContent.innerHTML = `
+                <h3>주문 관리</h3>
+                <div style="display:flex; gap:0.5rem; flex-wrap: wrap; margin: 0.5rem 0 1rem;">
+                    <input id="adminOrderSearch" placeholder="주문번호/상품명/고객명 검색" style="flex:1; padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
+                    <select id="adminOrderStatusFilter" style="padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
+                        <option value="">상태 전체</option>
+                        ${ORDER_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                    <select id="adminOrderUserFilter" style="padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
+                        <option value="">고객 전체</option>
+                        ${uniqueUsers.map(u=>`<option value="${u}">${u}</option>`).join('')}
+                    </select>
+                    <button class="cta-btn" style="background:#7f8c8d;" onclick="renderAdminOrdersTable()">검색</button>
+                </div>
+                <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.4rem;">
+                        <input type="checkbox" id="adminOrdersSelectAll" onchange="toggleSelectAllOrders(this.checked)"> 전체선택
+                    </label>
+                    <select id="adminBulkStatus" style="padding:0.4rem; border:1px solid #ddd; border-radius:6px;">
+                        <option value="">상태 선택</option>
+                        ${ORDER_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                    <button class="cta-btn" style="background:#27ae60; padding:0.5rem 1rem;" onclick="applyBulkStatus()">일괄 변경</button>
+                </div>
+                <div id="adminOrdersTable"></div>
+            `;
+            renderAdminOrdersTable();
+        }
+
+        function getAdminOrderFilters() {
+            const q = document.getElementById('adminOrderSearch')?.value?.trim().toLowerCase() || '';
+            const status = document.getElementById('adminOrderStatusFilter')?.value || '';
+            const user = document.getElementById('adminOrderUserFilter')?.value || '';
+            return { q, status, user };
+        }
+
+        function renderAdminOrdersTable() {
+            const container = document.getElementById('adminOrdersTable');
+            if (!container) return;
+            const { q, status, user } = getAdminOrderFilters();
+            let filtered = [...orders];
+            if (q) {
+                filtered = filtered.filter(o => (
+                    o.orderNumber.toLowerCase().includes(q) ||
+                    o.userName.toLowerCase().includes(q) ||
+                    o.items.some(it => (`${it.brand} ${it.name}`).toLowerCase().includes(q))
+                ));
+            }
+            if (status) filtered = filtered.filter(o => o.status === status);
+            if (user) filtered = filtered.filter(o => o.userName === user);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#666; padding:1rem;">주문이 없습니다.</p>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(o => `
+                <div style="border:1px solid #ddd; border-radius:10px; padding:1rem; margin:0.5rem 0;">
+                    <div style="display:flex; justify-content:space-between; gap:0.5rem; align-items:center;">
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <input type="checkbox" class="adminOrderCheckbox" data-ordernum="${o.orderNumber}">
+                            <div>
+                                <div style="font-weight:600;">${o.orderNumber}</div>
+                                <div style="color:#666; font-size:0.9rem;">${o.date} · ${o.userName}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <select onchange="adminUpdateOrderStatus('${o.orderNumber}', this.value)" style="padding:0.3rem; border-radius:6px; border:1px solid #ccc;">
+                                ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                            <button class="cta-btn" style="background:#2c3e50; padding:0.4rem 0.8rem;" onclick="reDownloadOrderPdf('${o.orderNumber}')">PDF</button>
+                        </div>
+                    </div>
+                    <div style="margin-top:0.6rem;">
+                        ${o.items.map(it => `
+                            <div style=\"display:flex; justify-content:space-between; color:#444;\">
+                                <span>${it.brand} ${it.name} x ${it.quantity}</span>
+                                <span>${(it.price * it.quantity).toLocaleString()}원</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="text-align:right; font-weight:600; margin-top:0.4rem; color:#e74c3c;">총 ${o.total.toLocaleString()}원</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleSelectAllOrders(checked) {
+            document.querySelectorAll('.adminOrderCheckbox').forEach(cb => { cb.checked = checked; });
+        }
+
+        function applyBulkStatus() {
+            const status = document.getElementById('adminBulkStatus').value;
+            if (!status) { alert('변경할 상태를 선택하세요.'); return; }
+            const selected = Array.from(document.querySelectorAll('.adminOrderCheckbox:checked')).map(cb => cb.getAttribute('data-ordernum'));
+            if (selected.length === 0) { alert('선택된 주문이 없습니다.'); return; }
+            selected.forEach(ordNum => adminUpdateOrderStatus(ordNum, status, { silent: true }));
+            persistOrders();
+            renderAdminOrdersTable();
+            alert(`총 ${selected.length}건의 주문 상태가 '${status}'로 변경되었습니다.`);
+        }
+
+        function adminUpdateOrderStatus(orderNumber, nextStatus, options = {}) {
+            const order = orders.find(o => o.orderNumber === orderNumber);
+            if (!order) return;
+            if (!ORDER_STATUSES.includes(nextStatus)) { alert('유효하지 않은 상태입니다.'); return; }
+            order.status = nextStatus;
+            persistOrders();
+            if (!options.silent) {
+                // 화면 갱신 (주문내역 모달이 열린 경우를 대비)
+                if (document.getElementById('orderHistoryContent')) {
+                    document.querySelectorAll('.modal').forEach(m => m.remove());
+                    showOrderHistory();
+                }
+                if (document.getElementById('adminOrdersTable')) {
+                    renderAdminOrdersTable();
+                }
+            }
+        }
+
+        function approveUser(userId) {
+            const userIndex = pendingUsers.findIndex(user => user.id === userId);
+            if (userIndex !== -1) {
+                const user = pendingUsers[userIndex];
+                user.status = 'approved';
+                users.push(user);
+                pendingUsers.splice(userIndex, 1);
+                showPendingUsers();
+                alert(`${user.name}님의 가입이 승인되었습니다.`);
+            }
+        }
+
+        function rejectUser(userId) {
+            const userIndex = pendingUsers.findIndex(user => user.id === userId);
+            if (userIndex !== -1) {
+                const user = pendingUsers[userIndex];
+                pendingUsers.splice(userIndex, 1);
+                showPendingUsers();
+                alert(`${user.name}님의 가입이 거부되었습니다.`);
+            }
+        }
+
+        // API functions (mock implementations)
+        async function loginUser(email, password) {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user && user.status === 'approved') {
+                currentUser = user;
+                updateHeaderButtons();
+                alert(`${user.name}님, 환영합니다!`);
+                return true;
+            } else if (user && user.status === 'pending') {
+                throw new Error('관리자 승인 대기중입니다.');
+            } else {
+                throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
+            }
+        }
+
+        async function registerUser(userData) {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const existingUser = users.find(u => u.email === userData.email) || 
+                               pendingUsers.find(u => u.email === userData.email);
+            
+            if (existingUser) {
+                throw new Error('이미 가입된 이메일입니다.');
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                ...userData,
+                role: 'user',
+                status: 'pending',
+                joinDate: new Date().toLocaleDateString('ko-KR')
+            };
+            
+            pendingUsers.push(newUser);
+            alert('회원가입이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.');
+            return true;
+        }
+
+        async function addProduct(productData, images) {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            const newProduct = {
+                id: Date.now(),
+                ...productData,
+                category: getCategoryName(productData.category_id)
+            };
+            
+            products.push(newProduct);
+            displayProducts();
+            alert('상품이 성공적으로 등록되었습니다.');
+            return true;
+        }
+
+        function getCategoryName(categoryId) {
+            const categories = {
+                1: '패션',
+                2: '전자제품', 
+                3: '뷰티',
+                4: '홈&리빙'
+            };
+            return categories[categoryId] || '기타';
+        }
+
+        // Utility functions
+        function showLoading(button, text) {
+            const originalText = button.textContent;
+            button.textContent = text;
+            button.disabled = true;
+            
+            return function hideLoading() {
+                button.textContent = originalText;
+                button.disabled = false;
+            };
+        }
+
+        function handleAPIError(error, defaultMessage) {
+            console.error('API Error:', error);
+            alert(error.message || defaultMessage);
+        }
+
+        // Orders persistence (localStorage)
+        function persistOrders() {
+            try {
+                localStorage.setItem('orders', JSON.stringify(orders));
+            } catch (_) {}
+        }
+
+        function loadOrders() {
+            try {
+                const saved = localStorage.getItem('orders');
+                if (saved) {
+                    orders = JSON.parse(saved);
+                }
+            } catch (_) {}
+        }
+
+        // PDF generation using jsPDF
+        // Ensure Korean font is fetched and cached (register per-document)
+        let pdfKoreanFontBase64 = null;
+        async function ensureKoreanFontLoaded() {
+            if (pdfKoreanFontBase64) return pdfKoreanFontBase64;
+            const fontUrl = 'https://fonts.gstatic.com/s/notosanskr/v36/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2';
+            const resp = await fetch(fontUrl);
+            if (!resp.ok) {
+                console.warn('한글 폰트 로드 실패, 기본 폰트로 진행합니다.');
+                return null; // 폰트 로드 실패 시 null 반환
+            }
+            const buf = await resp.arrayBuffer();
+            let binary = '';
+            const bytes = new Uint8Array(buf);
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+            }
+            pdfKoreanFontBase64 = btoa(binary);
+            return pdfKoreanFontBase64;
+        }
+
+        async function generateAndOfferOrderPdf(order) {
+            const { jsPDF } = window.jspdf || {};
+            if (!jsPDF) throw new Error('jsPDF가 로드되지 않았습니다.');
+            const base64 = await ensureKoreanFontLoaded();
+
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            
+            // 한글 폰트가 로드된 경우에만 등록
+            if (base64) {
+                doc.addFileToVFS('NotoSansKR.ttf', base64);
+                doc.addFont('NotoSansKR.ttf', 'NotoSansKR', 'normal');
+                doc.setFont('NotoSansKR', 'normal');
+            } else {
+                // 폰트 로드 실패 시 기본 폰트 사용
+                doc.setFont('helvetica', 'normal');
+                console.warn('한글 폰트 로드 실패, 기본 폰트로 PDF 생성합니다.');
+            }
+            let y = 40;
+
+            // Header with logo text
+            doc.setFont('NotoSansKR', 'normal');
+            doc.setFontSize(20);
+            doc.text(companyProfile.logoText, 40, y);
+            doc.setFontSize(12);
+            y += 20;
+            doc.setFont('NotoSansKR', 'normal');
+            doc.text(`${companyProfile.name}`, 40, y); y += 16;
+            doc.text(`사업자등록번호: ${companyProfile.bizNumber}`, 40, y); y += 16;
+            doc.text(`연락처: ${companyProfile.tel}  이메일: ${companyProfile.email}`, 40, y); y += 16;
+            doc.text(`주소: ${companyProfile.address}`, 40, y); y += 24;
+
+            // Title
+            doc.setFont('NotoSansKR', 'normal');
+            doc.setFontSize(16);
+            doc.text('주문서 / 영수증', 40, y); y += 20;
+            doc.setFontSize(12);
+            doc.setFont('NotoSansKR', 'normal');
+            doc.text(`주문번호: ${order.orderNumber}`, 40, y); y += 16;
+            doc.text(`주문일자: ${order.date}`, 40, y); y += 16;
+            doc.text(`주문자: ${order.userName}`, 40, y); y += 24;
+
+            // Items table (simple)
+            doc.setFont('NotoSansKR', 'normal');
+            doc.text('상품명', 40, y); doc.text('수량', 340, y); doc.text('금액', 420, y);
+            y += 12; doc.setLineWidth(0.5); doc.line(40, y, 550, y); y += 14;
+            doc.setFont('NotoSansKR', 'normal');
+            order.items.forEach(item => {
+                const name = `${item.brand} ${item.name}`;
+                doc.text(name, 40, y);
+                doc.text(String(item.quantity), 350, y, { align: 'right' });
+                doc.text(`${(item.price * item.quantity).toLocaleString()}원`, 540, y, { align: 'right' });
+                y += 16;
+            });
+            y += 6; doc.line(40, y, 550, y); y += 20;
+
+            // Total
+            doc.setFont('NotoSansKR', 'normal');
+            doc.text(`총 금액: ${order.total.toLocaleString()}원`, 540, y, { align: 'right' });
+            y += 30;
+
+            // Footer
+            doc.setFont('NotoSansKR', 'normal');
+            doc.setTextColor(120);
+            doc.text('본 문서는 전자적으로 생성된 주문서입니다.', 40, y);
+
+            const filename = `Order_${order.orderNumber}.pdf`;
+            doc.save(filename);
+        }
+
+        function reDownloadOrderPdf(orderNumber) {
+            const order = orders.find(o => o.orderNumber === orderNumber);
+            if (!order) { alert('주문을 찾을 수 없습니다.'); return; }
+            generateAndOfferOrderPdf(order);
+        }
+
+        // EmailJS 설정 및 이메일 발송
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_3n75a2d', // EmailJS 서비스 ID (service_ 중복 제거)
+            templateId: 'template_jkppj0x', // EmailJS 템플릿 ID
+            publicKey: 'ZLGf9XHeyqgjOUOIK' // EmailJS 퍼블릭 키
+        };
+
+        // EmailJS 초기화
+        function initEmailJS() {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_CONFIG.publicKey);
+                console.log('EmailJS 초기화 완료');
+            } else {
+                console.warn('EmailJS가 로드되지 않았습니다.');
+            }
+        }
+
+        // 이메일 발송 함수
+        async function sendOrderNotificationEmail(order) {
+            if (typeof emailjs === 'undefined') {
+                console.warn('EmailJS가 로드되지 않았습니다.');
+                return false;
+            }
+
+            try {
+                // 이메일 템플릿 변수 준비 (받는 사람 주소 제거)
+                const templateParams = {
+                    order_number: order.orderNumber,
+                    order_date: order.date,
+                    customer_name: order.userName,
+                    order_items: order.items.map(item => 
+                        `${item.brand} ${item.name} x ${item.quantity}개 - ${(item.price * item.quantity).toLocaleString()}원`
+                    ).join('\n'),
+                    total_amount: order.total.toLocaleString(),
+                    order_time: new Date().toLocaleString('ko-KR')
+                };
+
+                // 디버깅을 위한 로그
+                console.log('EmailJS 설정:', EMAILJS_CONFIG);
+                console.log('템플릿 변수:', templateParams);
+                
+                // 이메일 발송
+                const response = await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams
+                );
+
+                console.log('이메일 발송 성공:', response);
+                return true;
+            } catch (error) {
+                console.error('이메일 발송 실패:', error);
+                return false;
+            }
+        }
+
+        // 기존 알림 함수를 이메일 발송으로 변경
+        function notifyBusinessNewOrder(order) {
+            sendOrderNotificationEmail(order).then(success => {
+                if (success) {
+                    console.log('주문 알림 이메일이 발송되었습니다.');
+                } else {
+                    console.warn('주문 알림 이메일 발송에 실패했습니다.');
+                }
+            });
+        }
+
+        // Initialize categories for product form
+        const categories = [
+            { id: 1, name: '패션' },
+            { id: 2, name: '전자제품' },
+            { id: 3, name: '뷰티' },
+            { id: 4, name: '홈&리빙' }
+        ];
+
+        // Check login status on page load
+        function checkLoginStatus() {
+            // Check if user is logged in from localStorage
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateHeaderButtons();
+                // 로그인된 상태라면 상품 목록을 재렌더링하여 버튼 활성화
+                displayProducts();
+            }
+        }
+
+        // Save user to localStorage when logged in
+        function saveUserToStorage() {
+            if (currentUser) {
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem('currentUser');
+            }
+        }
+
+        // Override login function to save to localStorage
+        const originalLoginUser = loginUser;
+        loginUser = async function(email, password) {
+            const result = await originalLoginUser(email, password);
+            if (result) {
+                saveUserToStorage();
+                // 로그인 직후 상품 카드의 버튼 상태 반영
+                displayProducts();
+            }
+            return result;
+        };
+
+        // Override logout function to clear localStorage
+        const originalLogout = logout;
+        logout = function() {
+            originalLogout();
+            saveUserToStorage();
+            // 로그아웃 직후 상품 카드의 버튼 상태 반영
+            displayProducts();
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            updateCartBadge();
+            checkLoginStatus();
+            loadOrders();
+            initEmailJS(); // EmailJS 초기화
+        });
+
+        // Add CSS animation for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            .add-to-cart-btn:disabled {
+                background: #bdc3c7 !important;
+                cursor: not-allowed !important;
+                opacity: 0.6;
+            }
+            
+            .add-to-cart-btn:disabled:hover {
+                background: #bdc3c7 !important;
+                transform: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
