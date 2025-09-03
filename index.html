@@ -1685,7 +1685,10 @@
             if (pdfKoreanFontBase64) return pdfKoreanFontBase64;
             const fontUrl = 'https://fonts.gstatic.com/s/notosanskr/v36/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2';
             const resp = await fetch(fontUrl);
-            if (!resp.ok) throw new Error('한글 폰트 로드 실패');
+            if (!resp.ok) {
+                console.warn('한글 폰트 로드 실패, 기본 폰트로 진행합니다.');
+                return null; // 폰트 로드 실패 시 null 반환
+            }
             const buf = await resp.arrayBuffer();
             let binary = '';
             const bytes = new Uint8Array(buf);
@@ -1703,10 +1706,17 @@
             const base64 = await ensureKoreanFontLoaded();
 
             const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-            // Register font on this actual document instance
-            doc.addFileToVFS('NotoSansKR.ttf', base64);
-            doc.addFont('NotoSansKR.ttf', 'NotoSansKR', 'normal');
-            doc.setFont('NotoSansKR', 'normal');
+            
+            // 한글 폰트가 로드된 경우에만 등록
+            if (base64) {
+                doc.addFileToVFS('NotoSansKR.ttf', base64);
+                doc.addFont('NotoSansKR.ttf', 'NotoSansKR', 'normal');
+                doc.setFont('NotoSansKR', 'normal');
+            } else {
+                // 폰트 로드 실패 시 기본 폰트 사용
+                doc.setFont('helvetica', 'normal');
+                console.warn('한글 폰트 로드 실패, 기본 폰트로 PDF 생성합니다.');
+            }
             let y = 40;
 
             // Header with logo text
@@ -1790,9 +1800,9 @@
             }
 
             try {
-                // 이메일 템플릿 변수 준비
+                // 이메일 템플릿 변수 준비 (EmailJS 표준 변수명 사용)
                 const templateParams = {
-                    to_email: 'baumliving2025@gmail.com', // 사업자 이메일 (실제 이메일로 변경)
+                    to_email: 'baumliving2025@gmail.com',
                     order_number: order.orderNumber,
                     order_date: order.date,
                     customer_name: order.userName,
