@@ -705,9 +705,9 @@
                 <div style="text-align: center; margin-top: 1rem;">
                     <p>이미 계정이 있으신가요? <a href="#" onclick="showLogin()" style="color: #3498db;">로그인</a></p>
                 </div>
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-                    <i class="fas fa-info-circle" style="color: #e17055;"></i>
-                    <small style="color: #6c5ce7;">회원가입 후 관리자 승인이 완료되면 로그인할 수 있습니다.</small>
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <small style="color: #155724;">회원가입 후 바로 로그인할 수 있습니다.</small>
                 </div>
             </div>
         </div>
@@ -1624,19 +1624,16 @@
             console.log('현재 users:', users);
             console.log('현재 pendingUsers:', pendingUsers);
             
-            // users와 pendingUsers 모두에서 찾기
-            const user = users.find(u => u.email === email && u.password === password) ||
-                        pendingUsers.find(u => u.email === email && u.password === password);
+            // users에서만 찾기 (자동 승인으로 pendingUsers 불필요)
+            const user = users.find(u => u.email === email && u.password === password);
             
             console.log('찾은 사용자:', user);
             
-            if (user && user.status === 'approved') {
+            if (user) {
                 currentUser = user;
                 updateHeaderButtons();
                 alert(`${user.name}님, 환영합니다!`);
                 return true;
-            } else if (user && user.status === 'pending') {
-                throw new Error('관리자 승인 대기중입니다.');
             } else {
                 throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
             }
@@ -1646,8 +1643,7 @@
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            const existingUser = users.find(u => u.email === userData.email) || 
-                               pendingUsers.find(u => u.email === userData.email);
+            const existingUser = users.find(u => u.email === userData.email);
             
             if (existingUser) {
                 throw new Error('이미 가입된 이메일입니다.');
@@ -1657,12 +1653,12 @@
                 id: Date.now(),
                 ...userData,
                 role: 'user',
-                status: 'pending',
+                status: 'approved', // 자동 승인
                 joinDate: new Date().toLocaleDateString('ko-KR')
             };
             
-            pendingUsers.push(newUser);
-            alert('회원가입이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.');
+            users.push(newUser); // 바로 승인된 사용자 목록에 추가
+            alert('회원가입이 완료되었습니다. 바로 로그인할 수 있습니다.');
             return true;
         }
 
