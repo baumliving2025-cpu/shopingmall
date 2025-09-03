@@ -1579,11 +1579,16 @@
             const userIndex = pendingUsers.findIndex(user => user.id === userId);
             if (userIndex !== -1) {
                 const user = pendingUsers[userIndex];
-                user.status = 'approved';
-                users.push(user);
+                // 사용자 데이터를 완전히 복사하여 승인된 상태로 추가
+                const approvedUser = {
+                    ...user,
+                    status: 'approved'
+                };
+                users.push(approvedUser);
                 pendingUsers.splice(userIndex, 1);
                 showPendingUsers();
                 alert(`${user.name}님의 가입이 승인되었습니다.`);
+                console.log('승인된 사용자:', approvedUser); // 디버깅용
             }
         }
 
@@ -1602,9 +1607,16 @@
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             
+            // 디버깅용 로그
+            console.log('로그인 시도:', email);
+            console.log('현재 users:', users);
+            console.log('현재 pendingUsers:', pendingUsers);
+            
             // users와 pendingUsers 모두에서 찾기
             const user = users.find(u => u.email === email && u.password === password) ||
                         pendingUsers.find(u => u.email === email && u.password === password);
+            
+            console.log('찾은 사용자:', user);
             
             if (user && user.status === 'approved') {
                 currentUser = user;
