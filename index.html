@@ -1587,7 +1587,10 @@
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            const user = users.find(u => u.email === email && u.password === password);
+            // users와 pendingUsers 모두에서 찾기
+            const user = users.find(u => u.email === email && u.password === password) ||
+                        pendingUsers.find(u => u.email === email && u.password === password);
+            
             if (user && user.status === 'approved') {
                 currentUser = user;
                 updateHeaderButtons();
