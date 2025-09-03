@@ -1800,7 +1800,7 @@
             }
 
             try {
-                // 이메일 템플릿 변수 준비 (EmailJS 표준 변수명 사용)
+                // 이메일 템플릿 변수 준비 (간단한 변수명 사용)
                 const templateParams = {
                     to_email: 'baumliving2025@gmail.com',
                     order_number: order.orderNumber,
@@ -1813,6 +1813,10 @@
                     order_time: new Date().toLocaleString('ko-KR')
                 };
 
+                // 디버깅을 위한 로그
+                console.log('EmailJS 설정:', EMAILJS_CONFIG);
+                console.log('템플릿 변수:', templateParams);
+                
                 // 이메일 발송
                 const response = await emailjs.send(
                     EMAILJS_CONFIG.serviceId,
