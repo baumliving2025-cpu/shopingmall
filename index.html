@@ -446,7 +446,7 @@
             </div>
 
             <div class="header-actions">
-                <button class="header-btn" onclick="showSignupModal()" id="loginBtn">
+                <button class="header-btn" onclick="showLoginModal()" id="loginBtn">
                     <i class="fas fa-user"></i>
                 </button>
                 <button class="header-btn" onclick="toggleCart()">
@@ -1245,6 +1245,18 @@
             } else {
                 // 회원가입 모달 표시
                 showSignup();
+                document.getElementById('loginModal').style.display = 'block';
+            }
+        }
+
+        // 로그인 모달 표시 함수 (회원가입 모달과 분리)
+        function showLoginModal() {
+            if (currentUser) {
+                // 이미 로그인된 경우 사용자 정보 표시
+                showUserInfo();
+            } else {
+                // 로그인 모달 표시
+                showLogin();
                 document.getElementById('loginModal').style.display = 'block';
             }
         }
