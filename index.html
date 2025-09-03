@@ -1843,8 +1843,12 @@
             }
 
             try {
-                // 이메일 템플릿 변수 준비 (받는 사람 주소 제거)
+                // 주문한 사용자의 이메일 주소 찾기
+                const customerEmail = currentUser ? currentUser.email : 'unknown@example.com';
+                
+                // 이메일 템플릿 변수 준비 (주문한 사용자 이메일로 발송)
                 const templateParams = {
+                    to_email: customerEmail, // 주문한 사용자의 이메일
                     order_number: order.orderNumber,
                     order_date: order.date,
                     customer_name: order.userName,
@@ -1858,6 +1862,7 @@
                 // 디버깅을 위한 로그
                 console.log('EmailJS 설정:', EMAILJS_CONFIG);
                 console.log('템플릿 변수:', templateParams);
+                console.log('발송 대상 이메일:', customerEmail);
                 
                 // 이메일 발송
                 const response = await emailjs.send(
