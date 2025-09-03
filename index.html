@@ -12,6 +12,7 @@
     <title>ModernShop - 프리미엄 쇼핑몰</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="http://localhost:3000/api.js"></script>
     <style>
         * {
@@ -769,6 +770,7 @@
             loadProducts();
             updateCartBadge();
             loadOrders();
+            initEmailJS(); // EmailJS 초기화
             // checkLoginStatus will be called after all functions are defined
         });
 
@@ -1763,15 +1765,68 @@
             generateAndOfferOrderPdf(order);
         }
 
-        // Notification hook (stub)
-        function notifyBusinessNewOrder(order) {
-            // 비용 절감을 위해 외부 API는 선택적으로 설정
-            // 이 함수에서 카카오톡 비즈메시지/채널톡 웹훅 연동을 시도하거나, 없으면 콘솔로 대체
-            if (window.ModernShopNotify && typeof window.ModernShopNotify.send === 'function') {
-                try { window.ModernShopNotify.send({ type: 'new_order', order }); } catch (_) {}
+        // EmailJS 설정 및 이메일 발송
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_service_3n75a2d', // EmailJS 서비스 ID
+            templateId: 'template_jkppj0x', // EmailJS 템플릿 ID
+            publicKey: 'ZLGf9XHeyqgjOUOIK' // EmailJS 퍼블릭 키
+        };
+
+        // EmailJS 초기화
+        function initEmailJS() {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_CONFIG.publicKey);
+                console.log('EmailJS 초기화 완료');
             } else {
-                console.log('[알림] 새 주문 발생:', order.orderNumber, order.total);
+                console.warn('EmailJS가 로드되지 않았습니다.');
             }
+        }
+
+        // 이메일 발송 함수
+        async function sendOrderNotificationEmail(order) {
+            if (typeof emailjs === 'undefined') {
+                console.warn('EmailJS가 로드되지 않았습니다.');
+                return false;
+            }
+
+            try {
+                // 이메일 템플릿 변수 준비
+                const templateParams = {
+                    to_email: 'baumliving2025@gmail.com', // 사업자 이메일 (실제 이메일로 변경)
+                    order_number: order.orderNumber,
+                    order_date: order.date,
+                    customer_name: order.userName,
+                    order_items: order.items.map(item => 
+                        `${item.brand} ${item.name} x ${item.quantity}개 - ${(item.price * item.quantity).toLocaleString()}원`
+                    ).join('\n'),
+                    total_amount: order.total.toLocaleString(),
+                    order_time: new Date().toLocaleString('ko-KR')
+                };
+
+                // 이메일 발송
+                const response = await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams
+                );
+
+                console.log('이메일 발송 성공:', response);
+                return true;
+            } catch (error) {
+                console.error('이메일 발송 실패:', error);
+                return false;
+            }
+        }
+
+        // 기존 알림 함수를 이메일 발송으로 변경
+        function notifyBusinessNewOrder(order) {
+            sendOrderNotificationEmail(order).then(success => {
+                if (success) {
+                    console.log('주문 알림 이메일이 발송되었습니다.');
+                } else {
+                    console.warn('주문 알림 이메일 발송에 실패했습니다.');
+                }
+            });
         }
 
         // Initialize categories for product form
@@ -1830,6 +1885,7 @@
             updateCartBadge();
             checkLoginStatus();
             loadOrders();
+            initEmailJS(); // EmailJS 초기화
         });
 
         // Add CSS animation for notifications
