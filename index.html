@@ -446,7 +446,7 @@
             </div>
 
             <div class="header-actions">
-                <button class="header-btn" onclick="toggleLogin()" id="loginBtn">
+                <button class="header-btn" onclick="showSignupModal()" id="loginBtn">
                     <i class="fas fa-user"></i>
                 </button>
                 <button class="header-btn" onclick="toggleCart()">
@@ -1237,6 +1237,18 @@
             }
         }
 
+        // 회원가입 모달 표시 함수
+        function showSignupModal() {
+            if (currentUser) {
+                // 이미 로그인된 경우 사용자 정보 표시
+                showUserInfo();
+            } else {
+                // 회원가입 모달 표시
+                showSignup();
+                document.getElementById('loginModal').style.display = 'block';
+            }
+        }
+
         function closeLogin() {
             document.getElementById('loginModal').style.display = 'none';
         }
@@ -1353,6 +1365,9 @@
         function showSignup() {
             document.getElementById('loginContent').style.display = 'none';
             document.getElementById('signupContent').style.display = 'block';
+            
+            // 회원가입 폼 초기화
+            document.getElementById('signupForm').reset();
         }
 
         function showLogin() {
