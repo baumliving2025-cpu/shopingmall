@@ -1683,7 +1683,7 @@
         let pdfKoreanFontBase64 = null;
         async function ensureKoreanFontLoaded() {
             if (pdfKoreanFontBase64) return pdfKoreanFontBase64;
-            const fontUrl = 'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-kr/files/noto-sans-kr-korean-400-normal.ttf';
+            const fontUrl = 'https://fonts.gstatic.com/s/notosanskr/v36/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2';
             const resp = await fetch(fontUrl);
             if (!resp.ok) throw new Error('한글 폰트 로드 실패');
             const buf = await resp.arrayBuffer();
@@ -1767,7 +1767,7 @@
 
         // EmailJS 설정 및 이메일 발송
         const EMAILJS_CONFIG = {
-            serviceId: 'service_service_3n75a2d', // EmailJS 서비스 ID
+            serviceId: 'service_3n75a2d', // EmailJS 서비스 ID (service_ 중복 제거)
             templateId: 'template_jkppj0x', // EmailJS 템플릿 ID
             publicKey: 'ZLGf9XHeyqgjOUOIK' // EmailJS 퍼블릭 키
         };
