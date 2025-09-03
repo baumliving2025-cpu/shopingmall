@@ -1231,6 +1231,8 @@
                 // Show user info if logged in
                 showUserInfo();
             } else {
+                // 로그인 모달 초기화
+                showLogin();
                 document.getElementById('loginModal').style.display = 'block';
             }
         }
@@ -1356,6 +1358,9 @@
         function showLogin() {
             document.getElementById('signupContent').style.display = 'none';
             document.getElementById('loginContent').style.display = 'block';
+            
+            // 로그인 폼 초기화
+            document.getElementById('loginForm').reset();
         }
 
         // Admin panel functions
