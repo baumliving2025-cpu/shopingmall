@@ -39,3 +39,4 @@ FOR DELETE USING (
 -- 6. 설정 확인
 SELECT 'Storage 버킷이 성공적으로 생성되었습니다.' as message;
 SELECT * FROM storage.buckets WHERE id = 'product-images';
+

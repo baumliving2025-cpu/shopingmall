@@ -22,3 +22,4 @@ DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 
 -- 정리 완료 메시지
 SELECT '데이터베이스 정리 완료' as message;
+

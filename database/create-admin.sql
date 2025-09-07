@@ -39,3 +39,4 @@ ORDER BY role, status;
 
 -- 완료 메시지
 SELECT '관리자 계정 생성 완료' as message;
+

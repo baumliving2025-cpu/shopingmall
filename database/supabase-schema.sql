@@ -166,3 +166,4 @@ CREATE POLICY "Users can create order items for their orders" ON public.order_it
 -- cart_items 테이블 정책
 CREATE POLICY "Users can manage their own cart" ON public.cart_items
     FOR ALL USING (auth.uid() = user_id);
+

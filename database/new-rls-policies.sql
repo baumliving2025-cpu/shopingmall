@@ -115,3 +115,4 @@ CREATE POLICY "Admins can manage all cart items" ON cart_items
 
 -- 완료 메시지
 SELECT 'RLS 정책 설정 완료' as message;
+

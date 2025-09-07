@@ -112,3 +112,4 @@ CREATE POLICY "Admins can manage all cart items" ON cart_items
             WHERE id = auth.uid() AND role = 'admin'
         )
     );
+

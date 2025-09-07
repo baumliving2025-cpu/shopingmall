@@ -73,3 +73,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Supabase 초기화에 실패했습니다.');
     }
 });
+

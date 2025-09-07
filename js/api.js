@@ -256,3 +256,4 @@ window.API = {
     cart: cartAPI,
     instance: api
 };
+

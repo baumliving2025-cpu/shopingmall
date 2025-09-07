@@ -29,3 +29,4 @@ FROM products;
 
 -- 완료 메시지
 SELECT '샘플 데이터 삽입 완료' as message;
+
