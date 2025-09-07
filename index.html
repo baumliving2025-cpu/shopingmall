@@ -1,10 +1,4 @@
-        // Login modal
-        function toggleLogin() {
-            if (currentUser) {
-                // Show user info if logged in
-                showUserInfo();
-            } else {
-                document.getElementById('login<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -13,9 +7,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script type="module" src="api/supabase-client.js"></script>
-    <script src="js/api-integration.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="js/supabase-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -109,6 +104,955 @@
 
         .header-btn:hover {
             background: #f8f9fa;
+        }
+
+        .user-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .user-icon:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+
+        /* Admin Panel Styles */
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .tab-btn:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+
+        .admin-tab-content {
+            min-height: 400px;
+        }
+
+        .admin-actions {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Product Form Styles */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Image Upload Styles */
+        .image-upload-container {
+            margin-top: 0.5rem;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .image-upload-area:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .image-upload-area i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .image-upload-area p {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .upload-hint {
+            font-size: 0.875rem;
+            color: #999;
+        }
+
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-url-input {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Product List Styles */
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .product-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card-content {
+            padding: 1.5rem;
+        }
+
+        .product-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-card-brand {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-card-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .product-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .product-stock {
+            background: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .product-stock.low {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .product-stock.out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 추가 관리자 패널 스타일 */
+        .product-registration {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .product-registration h4 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .product-form {
+            max-width: 800px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-list-management {
+            margin-top: 2rem;
+        }
+
+        .product-list-management h4 {
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .admin-product-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .admin-product-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+
+        .admin-product-info {
+            flex: 1;
+        }
+
+        .admin-product-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .admin-product-details {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* 이미지 업로드 관련 스타일 */
+        .image-upload-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + span {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .image-preview-item .remove-btn:hover {
+            background: rgba(255, 0, 0, 1);
+        }
+
+        /* 주문내역 모달 스타일 */
+        .order-history-content {
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .order-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .order-filters select,
+        .order-filters input[type="date"] {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .order-filters button {
+            padding: 0.5rem 1rem;
+            font-size: 14px;
+        }
+
+        .order-item {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .order-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-info h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .order-info p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .order-total h3 {
+            margin: 0;
+            color: #e74c3c;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-주문접수 { 
+            background: #e3f2fd; 
+            color: #1976d2; 
+        }
+        .status-처리중 { 
+            background: #fff3e0; 
+            color: #f57c00; 
+        }
+        .status-배송중 { 
+            background: #e8f5e8; 
+            color: #388e3c; 
+        }
+        .status-완료 { 
+            background: #f3e5f5; 
+            color: #7b1fa2; 
+        }
+        .status-취소 { 
+            background: #ffebee; 
+            color: #d32f2f; 
+        }
+
+        .order-products {
+            margin-bottom: 15px;
+        }
+
+        .order-product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .order-product img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .product-details h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .product-details p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .order-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-orders i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .loading-orders {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-orders i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 사이트 설정 스타일 */
+        .settings-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .settings-section h4 {
+            color: #495057;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .settings-form .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .settings-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .settings-form .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .settings-form .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .settings-form .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .settings-actions .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-actions .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .settings-form .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-actions {
+                flex-direction: column;
+            }
+            
+            .settings-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .admin-order-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .order-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .order-status.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .order-status.shipping {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .order-status.completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* 상품 등록 폼 입력 필드 스타일 수정 */
+        .product-form .form-group input,
+        .product-form .form-group textarea,
+        .product-form .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white !important;
+            color: #333 !important;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .product-form .form-group input:focus,
+        .product-form .form-group textarea:focus,
+        .product-form .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            background-color: white !important;
+            color: #333 !important;
+        }
+
+        .product-form .form-group input:not(:disabled):not(:read-only) {
+            background-color: white !important;
+            color: #333 !important;
+        }
+
+        .product-form .form-group input:hover,
+        .product-form .form-group textarea:hover,
+        .product-form .form-group select:hover {
+            border-color: #007bff;
+            background-color: white !important;
+        }
+
+        .product-form .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .product-form .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .product-form .form-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        /* 관리자 모달 스크롤 개선 */
+        .admin-modal .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .admin-modal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .product-registration {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .product-list-management {
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
         .cart-badge {
@@ -448,9 +1392,9 @@
             </div>
 
             <div class="header-actions">
-                <button class="header-btn" onclick="showLoginModal()" id="loginBtn">
+                <div class="user-icon" id="loginBtn">
                     <i class="fas fa-user"></i>
-                </button>
+                </div>
                 <button class="header-btn" onclick="toggleCart()">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
@@ -547,15 +1491,20 @@
                     <li><a href="#">이용약관</a></li>
                     <li><a href="#">개인정보처리방침</a></li>
                 </ul>
+                <div class="company-info">
+                    <p><strong class="footer-company-name">ModernShop</strong></p>
+                    <p class="footer-company-address">서울특별시 강남구 테헤란로 123, 10층</p>
+                    <p class="footer-business-number">사업자등록번호: 123-45-67890</p>
+                </div>
             </div>
             
             <div class="footer-section">
                 <h3>고객센터</h3>
                 <ul>
-                    <li><a href="#">1588-0000</a></li>
-                    <li><a href="#">help@modernshop.com</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">1:1 문의</a></li>
+                    <li><a href="tel:1588-0000" class="footer-phone">1588-0000</a></li>
+                    <li><a href="mailto:help@modernshop.com" class="footer-email">help@modernshop.com</a></li>
+                    <li><a href="#" class="footer-faq">FAQ</a></li>
+                    <li><a href="#" class="footer-inquiry">1:1 문의</a></li>
                 </ul>
             </div>
             
@@ -670,11 +1619,11 @@
                 <form id="loginForm">
                     <div class="form-group">
                         <label>이메일</label>
-                        <input type="email" id="loginEmail" required>
+                        <input type="email" id="loginEmail" required autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label>비밀번호</label>
-                        <input type="password" id="loginPassword" required>
+                        <input type="password" id="loginPassword" required autocomplete="current-password" minlength="6">
                     </div>
                     <button type="submit" class="cta-btn" style="width: 100%;">로그인</button>
                 </form>
@@ -688,19 +1637,19 @@
                 <form id="signupForm">
                     <div class="form-group">
                         <label>이름</label>
-                        <input type="text" id="signupName" required>
+                        <input type="text" id="signupName" required autocomplete="name">
                     </div>
                     <div class="form-group">
                         <label>이메일</label>
-                        <input type="email" id="signupEmail" required>
+                        <input type="email" id="signupEmail" required autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label>비밀번호</label>
-                        <input type="password" id="signupPassword" required minlength="6">
+                        <input type="password" id="signupPassword" required autocomplete="new-password" minlength="6">
                     </div>
                     <div class="form-group">
                         <label>비밀번호 확인</label>
-                        <input type="password" id="signupPasswordConfirm" required minlength="6">
+                        <input type="password" id="signupPasswordConfirm" required autocomplete="new-password" minlength="6">
                     </div>
                     <button type="submit" class="cta-btn" style="width: 100%;">가입 신청</button>
                 </form>
@@ -716,34 +1665,335 @@
     </div>
 
     <!-- Admin Panel Modal -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
+    <div id="adminModal" class="modal admin-modal">
+        <div class="modal-content" style="max-width: 1000px;">
             <span class="close" onclick="closeAdminPanel()">&times;</span>
             <h2>관리자 패널</h2>
             
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                <button class="cta-btn" onclick="showPendingUsers()" style="background: #000; color: #fff;">
-                    대기중인 회원 (<span id="pendingCount">0</span>)
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('users')">
+                    <i class="fas fa-users"></i> 사용자 관리
                 </button>
-                <button class="cta-btn" onclick="showAllUsers()" style="background: #000; color: #fff;">
-                    전체 회원 관리
+                <button class="tab-btn" onclick="showAdminTab('products')">
+                    <i class="fas fa-box"></i> 상품 관리
                 </button>
-                <button class="cta-btn" onclick="showAdminOrders()" style="background: #000; color: #fff;">
-                    주문 관리
+                <button class="tab-btn" onclick="showAdminTab('orders')">
+                    <i class="fas fa-shopping-cart"></i> 주문 관리
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('settings')">
+                    <i class="fas fa-cog"></i> 사이트 설정
                 </button>
             </div>
             
             <div id="adminContent">
-                <!-- Admin content will be loaded here -->
+                <!-- 사용자 관리 탭 -->
+                <div id="usersTab" class="admin-tab-content">
+                    <h3>사용자 관리</h3>
+                    <div class="admin-actions">
+                        <button onclick="loadPendingUsers()" class="btn btn-warning">
+                            <i class="fas fa-clock"></i> 대기중인 회원 (<span id="pendingCount">0</span>)
+                        </button>
+                        <button onclick="loadAllUsers()" class="btn btn-success">
+                            <i class="fas fa-users"></i> 전체 회원 관리
+                        </button>
+                    </div>
+                    <div id="usersList"></div>
+                </div>
+                
+                <!-- 상품 관리 탭 -->
+                <div id="productsTab" class="admin-tab-content" style="display: none;">
+                    <h3>상품 관리</h3>
+                    
+                    <!-- 새 상품 등록 섹션 -->
+                    <div class="product-registration">
+                        <h4>새 상품 등록</h4>
+                        <form id="productRegistrationForm" class="product-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="newProductName">상품명 *</label>
+                                    <input type="text" id="newProductName" name="productName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newProductBrand">브랜드 *</label>
+                                    <input type="text" id="newProductBrand" name="productBrand" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newProductPrice">가격 *</label>
+                                    <input type="number" id="newProductPrice" name="productPrice" min="0" step="100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newProductCategory">카테고리 *</label>
+                                    <select id="newProductCategory" name="productCategory" required>
+                                        <option value="">카테고리 선택</option>
+                                        <option value="패션">패션</option>
+                                        <option value="전자제품">전자제품</option>
+                                        <option value="뷰티">뷰티</option>
+                                        <option value="홈&리빙">홈&리빙</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newProductDescription">상세설명</label>
+                                <textarea id="newProductDescription" name="productDescription" rows="3" placeholder="상품에 대한 자세한 설명을 입력하세요"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>이미지 등록 방식</label>
+                                <div class="image-upload-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="imageMethod" value="url" checked>
+                                        <span>URL 입력</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="imageMethod" value="file">
+                                        <span>파일 업로드</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="imageUrlSection" class="form-group">
+                                <label for="newProductImageUrl">이미지 URL</label>
+                                <input type="url" id="newProductImageUrl" name="productImageUrl" placeholder="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop&auto=format">
+                                <small>상품 이미지 URL을 입력하세요</small>
+                            </div>
+
+                            <div id="imageFileSection" class="form-group" style="display: none;">
+                                <label for="newProductImageFile">이미지 파일</label>
+                                <input type="file" id="newProductImageFile" name="productImageFile" accept="image/*" multiple>
+                                <small>이미지 파일을 선택하세요 (최대 5개)</small>
+                                <div id="imagePreview" class="image-preview-container"></div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="newProductStock">재고 수량 *</label>
+                                    <input type="number" id="newProductStock" name="productStock" value="0" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newProductDiscount">할인율 (%)</label>
+                                    <input type="number" id="newProductDiscount" name="productDiscount" value="0" min="0" max="100">
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> 상품 등록
+                                </button>
+                                <button type="button" onclick="resetProductForm()" class="btn btn-secondary">
+                                    <i class="fas fa-eraser"></i> 폼 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- 기존 상품 관리 섹션 -->
+                    <div class="product-list-management">
+                        <h4>등록된 상품 목록</h4>
+                        <div class="admin-actions">
+                            <button onclick="refreshProductList()" class="btn btn-info">
+                                <i class="fas fa-sync"></i> 목록 새로고침
+                            </button>
+                        </div>
+                        <div id="adminProductList">
+                            <!-- 상품 목록이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 주문 관리 탭 -->
+                <div id="ordersTab" class="admin-tab-content" style="display: none;">
+                    <h3>주문 내역 관리</h3>
+                    <div class="admin-actions">
+                        <button onclick="loadAdminOrders()" class="btn btn-info">
+                            <i class="fas fa-sync"></i> 주문 목록 새로고침
+                        </button>
+                    </div>
+                    <div id="adminOrderList">
+                        <!-- 주문 내역이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+                
+                <!-- 사이트 설정 탭 -->
+                <div id="settingsTab" class="admin-tab-content" style="display: none;">
+                    <h3>사이트 설정</h3>
+                    
+                    <!-- 고객센터 정보 섹션 -->
+                    <div class="settings-section">
+                        <h4><i class="fas fa-headset"></i> 고객센터 정보</h4>
+                        <form id="customerServiceForm" class="settings-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="customerPhone">전화번호</label>
+                                    <input type="text" id="customerPhone" name="customer_phone" placeholder="1588-0000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="customerEmail">이메일</label>
+                                    <input type="email" id="customerEmail" name="customer_email" placeholder="help@modernshop.com">
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="faqLink">FAQ 링크</label>
+                                    <input type="text" id="faqLink" name="faq_link" placeholder="/faq">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inquiryLink">1:1 문의 링크</label>
+                                    <input type="text" id="inquiryLink" name="inquiry_link" placeholder="/inquiry">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 고객센터 정보 저장
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- 회사 정보 섹션 -->
+                    <div class="settings-section">
+                        <h4><i class="fas fa-building"></i> 회사 정보</h4>
+                        <form id="companyInfoForm" class="settings-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="companyName">회사명</label>
+                                    <input type="text" id="companyName" name="company_name" placeholder="ModernShop">
+                                </div>
+                                <div class="form-group">
+                                    <label for="companyCeo">대표자</label>
+                                    <input type="text" id="companyCeo" name="company_ceo" placeholder="홍길동">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyAddress">주소</label>
+                                <input type="text" id="companyAddress" name="company_address" placeholder="서울특별시 강남구 테헤란로 123, 10층">
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="telecomLicense">통신판매업신고번호</label>
+                                    <input type="text" id="telecomLicense" name="telecom_license" placeholder="2024-서울강남-01234">
+                                </div>
+                                <div class="form-group">
+                                    <label for="businessNumber">사업자등록번호</label>
+                                    <input type="text" id="businessNumber" name="business_number" placeholder="123-45-67890">
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="companyWebsite">웹사이트</label>
+                                    <input type="url" id="companyWebsite" name="company_website" placeholder="https://modernshop.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="companyDescription">회사 설명</label>
+                                    <input type="text" id="companyDescription" name="company_description" placeholder="프리미엄 온라인 쇼핑몰">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 회사 정보 저장
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- 설정 초기화 섹션 -->
+                    <div class="settings-section">
+                        <h4><i class="fas fa-refresh"></i> 설정 관리</h4>
+                        <div class="settings-actions">
+                            <button onclick="loadSiteSettings()" class="btn btn-secondary">
+                                <i class="fas fa-sync"></i> 설정 새로고침
+                            </button>
+                            <button onclick="resetSiteSettings()" class="btn btn-warning">
+                                <i class="fas fa-undo"></i> 기본값으로 초기화
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Add/Edit Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="closeProductModal()">&times;</span>
+            <h2 id="productModalTitle">상품 추가</h2>
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalProductName">상품명 *</label>
+                        <input type="text" id="modalProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductBrand">브랜드명 *</label>
+                        <input type="text" id="modalProductBrand" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalProductPrice">가격 *</label>
+                        <input type="number" id="modalProductPrice" min="0" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductCategory">카테고리 *</label>
+                        <select id="modalProductCategory" required>
+                            <option value="">카테고리 선택</option>
+                            <option value="패션">패션</option>
+                            <option value="전자제품">전자제품</option>
+                            <option value="뷰티">뷰티</option>
+                            <option value="홈&리빙">홈&리빙</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalProductStock">재고 수량 *</label>
+                        <input type="number" id="modalProductStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductDiscount">할인율 (%)</label>
+                        <input type="number" id="modalProductDiscount" min="0" max="100" step="1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalProductDescription">상세설명</label>
+                    <textarea id="modalProductDescription" rows="4" placeholder="상품에 대한 자세한 설명을 입력하세요"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>상품 이미지</label>
+                    <div class="image-upload-container">
+                        <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>이미지를 드래그하거나 클릭하여 업로드</p>
+                            <p class="upload-hint">최대 5개, JPG/PNG/GIF 지원</p>
+                        </div>
+                        <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                        <div id="imagePreview" class="image-preview"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imageUrls">또는 이미지 URL 직접 입력</label>
+                    <div id="imageUrlInputs">
+                        <input type="url" class="image-url-input" placeholder="https://example.com/image1.jpg">
+                    </div>
+                    <button type="button" onclick="addImageUrlInput()" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> URL 추가
+                    </button>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="closeProductModal()" class="btn btn-secondary">취소</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Global variables
-        let products = [];
-        let cart = [];
-        let orders = [];
+        // Global variables (supabase-app.js에서 선언됨)
         const ORDER_STATUSES = ['주문접수', '처리중', '배송중', '완료'];
         const companyProfile = {
             name: 'ModernShop Inc.',
@@ -753,985 +2003,44 @@
             address: '서울특별시 강남구 테크로 100',
             logoText: 'ModernShop'
         };
-        let users = [
-            {
-                id: 1,
-                email: 'admin@modernshop.com',
-                password: 'admin123',
-                name: '관리자',
-                role: 'admin',
-                status: 'approved',
-                joinDate: '2025-01-01'
-            }
-        ];
-        let currentUser = null;
-        let pendingUsers = [];
+        // localStorage 기반 변수들 제거됨 - Supabase 사용
 
 
 
-        // Product management
-        function loadProducts() {
-            // Sample brand products
-            if (products.length === 0) {
-                products = [
-                    {
-                        id: 1,
-                        name: "Nike Air Max 270",
-                        price: 159000,
-                        category: "패션",
-                        brand: "Nike",
-                        description: "편안함과 스타일을 모두 갖춘 나이키 에어맥스",
-                        badge: "BEST"
-                    },
-                    {
-                        id: 2,
-                        name: "Dyson V15 무선청소기",
-                        price: 890000,
-                        category: "전자제품",
-                        brand: "Dyson",
-                        description: "강력한 흡입력의 프리미엄 무선청소기",
-                        badge: "NEW"
-                    },
-                    {
-                        id: 3,
-                        name: "Chanel No.5 Parfum",
-                        price: 245000,
-                        category: "뷰티",
-                        brand: "Chanel",
-                        description: "전 세계가 사랑하는 클래식 향수",
-                        badge: "HOT"
-                    },
-                    {
-                        id: 4,
-                        name: "Herman Miller Aeron Chair",
-                        price: 1850000,
-                        category: "홈&리빙",
-                        brand: "Herman Miller",
-                        description: "인체공학적 설계의 프리미엄 사무용 의자"
-                    },
-                    {
-                        id: 5,
-                        name: "Adidas Ultraboost 22",
-                        price: 189000,
-                        category: "패션",
-                        brand: "Adidas",
-                        description: "최고의 러닝 퍼포먼스를 위한 운동화",
-                        badge: "NEW"
-                    },
-                    {
-                        id: 6,
-                        name: "Apple iPhone 15 Pro",
-                        price: 1350000,
-                        category: "전자제품",
-                        brand: "Apple",
-                        description: "티타늄 디자인의 프로 스마트폰"
-                    }
-                ];
-            }
-            displayProducts();
-        }
+        // Product management functions removed - now using Supabase
 
-        function displayProducts(filter = '전체') {
-            const grid = document.getElementById('productsGrid');
-            let filteredProducts = filter === '전체' ? products : products.filter(p => p.category === filter);
-            
-            grid.innerHTML = filteredProducts.map(product => `
-                <div class="product-card">
-                    <div class="product-image">
-                        <i class="fas fa-image"></i>
-                        ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
-                    </div>
-                    <div class="product-info">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <h3 class="product-title">${product.name}</h3>
-                            <span style="font-size: 0.8rem; background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 10px; color: #666;">${product.brand}</span>
-                        </div>
-                        <div class="product-price">${product.price.toLocaleString()}원</div>
-                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${product.description}</p>
-                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})" ${!currentUser ? 'disabled title="로그인이 필요합니다"' : ''}>
-                            <i class="fas fa-shopping-cart"></i> 장바구니 담기
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
 
-        function showProducts(category) {
-            displayProducts(category);
-            scrollToProducts();
-        }
+        // Add product functionality removed - now using Supabase
 
-        function scrollToProducts() {
-            document.getElementById('productsSection').scrollIntoView({ behavior: 'smooth' });
-        }
+        // Add product form event listener removed - now using Supabase
 
-        // Add product functionality
-        function showAddProduct() {
-            document.getElementById('addProductModal').style.display = 'block';
-        }
+        // Cart functionality removed - now using Supabase
 
-        function closeAddProduct() {
-            document.getElementById('addProductModal').style.display = 'none';
-        }
+        // Checkout functionality removed - now using Supabase
 
-        document.getElementById('addProductForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('관리자만 상품을 등록할 수 있습니다.');
-                return;
-            }
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const hideLoading = showLoading(submitBtn, '등록 중...');
-            
-            try {
-                // 카테고리 ID 찾기
-                const categoryName = document.getElementById('productCategory').value;
-                const category = categories.find(c => c.name === categoryName);
-                if (!category) {
-                    throw new Error('유효하지 않은 카테고리입니다.');
-                }
-                
-                const productData = {
-                    name: document.getElementById('productName').value,
-                    price: parseFloat(document.getElementById('productPrice').value),
-                    original_price: document.getElementById('productOriginalPrice')?.value || null,
-                    brand: document.getElementById('productBrand').value,
-                    category_id: category.id,
-                    description: document.getElementById('productDescription').value,
-                    stock_quantity: parseInt(document.getElementById('productStock').value) || 0,
-                    weight: parseFloat(document.getElementById('productWeight').value) || null,
-                    dimensions: document.getElementById('productDimensions').value || null,
-                    tags: document.getElementById('productTags').value ? 
-                        document.getElementById('productTags').value.split(',').map(tag => tag.trim()) : null,
-                    is_featured: document.getElementById('productFeatured').checked,
-                    badge: 'NEW'
-                };
+        // showOrderConfirmation function removed - now using Supabase
 
-                // 이미지 파일 가져오기
-                const imageFiles = document.getElementById('productImages').files;
-                const images = Array.from(imageFiles);
+        // Order history function removed - now using Supabase
 
-                const success = await addProduct(productData, images);
-                
-                if (success) {
-                    closeAddProduct();
-                    document.getElementById('addProductForm').reset();
-                }
-            } catch (error) {
-                handleAPIError(error, '상품 등록에 실패했습니다.');
-            } finally {
-                hideLoading();
-            }
-        });
+        // Search functionality removed - now using Supabase
 
-        // Cart functionality
-        function addToCart(productId) {
-            if (!currentUser) {
-                alert('로그인이 필요합니다.');
-                toggleLogin();
-                return;
-            }
+        // Enter key search event listener removed - now using Supabase
 
-            const product = products.find(p => p.id === productId);
-            const existingItem = cart.find(item => item.id === productId);
+        // Login modal functions removed - now using Supabase
 
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
+        // Form event listeners removed - now using Supabase
 
-            updateCartBadge();
-            showCartNotification();
-        }
+        // User management functions removed - now using Supabase
 
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            displayCart();
-            updateCartBadge();
-        }
+        // Modal functions removed - now using Supabase
 
-        function updateQuantity(productId, change) {
-            const item = cart.find(item => item.id === productId);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity <= 0) {
-                    removeFromCart(productId);
-                    return;
-                }
-                displayCart();
-                updateCartBadge();
-            }
-        }
+        // Admin panel functions removed - now using Supabase
 
-        function updateCartBadge() {
-            const badge = document.getElementById('cartBadge');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            badge.textContent = totalItems;
-        }
+        // Admin Orders Management functions removed - now using Supabase
 
-        function toggleCart() {
-            document.getElementById('cartModal').style.display = 'block';
-            displayCart();
-        }
+        // Mock API functions removed - now using Supabase
 
-        function closeCart() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-
-        function displayCart() {
-            const cartItems = document.getElementById('cartItems');
-            const totalPrice = document.getElementById('totalPrice');
-
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">장바구니가 비어있습니다.</p>';
-                totalPrice.textContent = '총 금액: 0원';
-                return;
-            }
-
-            cartItems.innerHTML = cart.map(item => `
-                <div style="display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
-                    <div style="flex: 1;">
-                        <h4>${item.name}</h4>
-                        <p style="color: #666;">${item.price.toLocaleString()}원</p>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <button onclick="updateQuantity(${item.id}, -1)" style="background: #f8f9fa; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">-</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="updateQuantity(${item.id}, 1)" style="background: #f8f9fa; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">+</button>
-                        <button onclick="removeFromCart(${item.id})" style="background: #e74c3c; color: white; border: none; padding: 0.5rem; border-radius: 5px; cursor: pointer;">삭제</button>
-                    </div>
-                </div>
-            `).join('');
-
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            totalPrice.textContent = `총 금액: ${total.toLocaleString()}원`;
-        }
-
-        function showCartNotification() {
-            // Create a temporary notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: #27ae60;
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                z-index: 3000;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.innerHTML = '<i class="fas fa-check"></i> 상품이 장바구니에 추가되었습니다!';
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 2000);
-        }
-
-        // Checkout functionality
-        function checkout() {
-            if (!currentUser) {
-                alert('로그인이 필요합니다.');
-                closeCart();
-                toggleLogin();
-                return;
-            }
-
-            if (cart.length === 0) {
-                alert('장바구니가 비어있습니다.');
-                return;
-            }
-
-            // Generate random order number
-            const orderNumber = 'ORD' + Date.now() + Math.floor(Math.random() * 1000);
-            const orderDate = new Date().toLocaleDateString('ko-KR');
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            const order = {
-                orderNumber,
-                date: orderDate,
-                items: [...cart],
-                total,
-                status: '주문접수',
-                userId: currentUser.id,
-                userName: currentUser.name
-            };
-
-            orders.push(order);
-            persistOrders();
-            try {
-                generateAndOfferOrderPdf(order);
-            } catch (e) {
-                console.warn('PDF 생성 실패:', e);
-            }
-            try {
-                notifyBusinessNewOrder(order);
-            } catch (e) {
-                console.warn('알림 실패:', e);
-            }
-            
-            // Clear cart
-            cart = [];
-            updateCartBadge();
-            closeCart();
-
-            // Show order confirmation
-            showOrderConfirmation(order);
-        }
-
-        function showOrderConfirmation(order) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content" style="text-align: center;">
-                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <div style="padding: 2rem;">
-                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;"></i>
-                        <h2 style="color: #27ae60; margin-bottom: 1rem;">주문이 완료되었습니다!</h2>
-                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
-                            <p><strong>주문번호:</strong> ${order.orderNumber}</p>
-                            <p><strong>주문일자:</strong> ${order.date}</p>
-                            <p><strong>결제금액:</strong> ${order.total.toLocaleString()}원</p>
-                        </div>
-                        <p style="color: #666; margin-bottom: 2rem;">주문 내역은 주문조회에서 확인하실 수 있습니다.</p>
-                        <div style="display: flex; gap: 1rem; justify-content: center;">
-                            <button class="cta-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">확인</button>
-                            <button class="cta-btn" style="background: #2c3e50;" onclick="reDownloadOrderPdf('${order.orderNumber}')">PDF 다운로드</button>
-                            <button class="cta-btn" style="background: #34495e;" onclick="showOrderHistory()">주문내역 보기</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Order history
-        function showOrderHistory() {
-            if (!currentUser) {
-                alert('로그인이 필요합니다.');
-                toggleLogin();
-                return;
-            }
-
-            // Close any existing modals
-            document.querySelectorAll('.modal').forEach(modal => modal.remove());
-            
-            // Filter orders for current user (admin can see all orders)
-            const userOrders = currentUser.role === 'admin' ? orders : orders.filter(order => order.userId === currentUser.id);
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 700px;">
-                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <h2>${currentUser.role === 'admin' ? '전체 주문 내역' : '나의 주문 내역'}</h2>
-                    <div id="orderHistoryContent">
-                        ${userOrders.length === 0 ? 
-                            '<p style="text-align: center; color: #666; padding: 2rem;">주문 내역이 없습니다.</p>' :
-                            userOrders.map(order => `
-                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1.5rem; margin: 1rem 0;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                                        <div>
-                                            <h4>${order.orderNumber}</h4>
-                                            <p style="color: #666; font-size: 0.9rem;">${order.date}</p>
-                                            ${currentUser.role === 'admin' ? `<p style="color: #3498db; font-size: 0.9rem;">주문자: ${order.userName}</p>` : ''}
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">${order.status}</span>
-                                            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
-                                                <button class="cta-btn" style="padding: 0.4rem 0.8rem; background: #2c3e50;" onclick="reDownloadOrderPdf('${order.orderNumber}')">PDF</button>
-                                                ${currentUser.role === 'admin' ? `
-                                                    <select onchange="adminUpdateOrderStatus('${order.orderNumber}', this.value)" style="padding: 0.3rem; border-radius: 6px; border: 1px solid #ccc;">
-                                                        ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s}</option>`).join('')}
-                                                    </select>
-                                                ` : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style="margin-bottom: 1rem;">
-                                        ${order.items.map(item => `
-                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                <span>${item.brand} ${item.name} x ${item.quantity}</span>
-                                                <span>${(item.price * item.quantity).toLocaleString()}원</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <div style="text-align: right; font-weight: bold; font-size: 1.1rem; color: #e74c3c;">
-                                        총 금액: ${order.total.toLocaleString()}원
-                                    </div>
-                                </div>
-                            `).join('')
-                        }
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Search functionality
-        function search() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (query === '') {
-                displayProducts();
-                return;
-            }
-
-            const filteredProducts = products.filter(product => 
-                product.name.toLowerCase().includes(query) || 
-                product.description.toLowerCase().includes(query) ||
-                product.category.toLowerCase().includes(query)
-            );
-
-            const grid = document.getElementById('productsGrid');
-            if (filteredProducts.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1 / -1; padding: 2rem;">검색 결과가 없습니다.</p>';
-            } else {
-                grid.innerHTML = filteredProducts.map(product => `
-                    <div class="product-card">
-                        <div class="product-image">
-                            <i class="fas fa-image"></i>
-                            ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">${product.name}</h3>
-                            <div class="product-price">${product.price.toLocaleString()}원</div>
-                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${product.description}</p>
-                            <button class="add-to-cart-btn" onclick="addToCart(${product.id})" ${!currentUser ? 'disabled title="로그인이 필요합니다"' : ''}>
-                                <i class="fas fa-shopping-cart"></i> 장바구니 담기
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            scrollToProducts();
-        }
-
-        // Enter key search
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                search();
-            }
-        });
-
-        // Login modal
-        function toggleLogin() {
-            if (currentUser) {
-                // Show user info if logged in
-                showUserInfo();
-            } else {
-                // 로그인 모달 초기화
-                showLogin();
-                document.getElementById('loginModal').style.display = 'block';
-            }
-        }
-
-        // 회원가입 모달 표시 함수
-        function showSignupModal() {
-            if (currentUser) {
-                // 이미 로그인된 경우 사용자 정보 표시
-                showUserInfo();
-            } else {
-                // 회원가입 모달 표시
-                showSignup();
-                document.getElementById('loginModal').style.display = 'block';
-            }
-        }
-
-        // 로그인 모달 표시 함수 (회원가입 모달과 분리)
-        function showLoginModal() {
-            if (currentUser) {
-                // 이미 로그인된 경우 사용자 정보 표시
-                showUserInfo();
-            } else {
-                // 로그인 모달 표시
-                showLogin();
-                document.getElementById('loginModal').style.display = 'block';
-            }
-        }
-
-        function closeLogin() {
-            document.getElementById('loginModal').style.display = 'none';
-        }
-
-        // 로그인 폼 이벤트 리스너
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const hideLoading = showLoading(submitBtn, '로그인 중...');
-            
-            try {
-                const success = await loginUser(email, password);
-                if (success) {
-                    closeLogin();
-                }
-            } catch (error) {
-                handleAPIError(error, '로그인에 실패했습니다.');
-            } finally {
-                hideLoading();
-            }
-        });
-
-        // 회원가입 폼 이벤트 리스너
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
-            
-            if (password !== passwordConfirm) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return;
-            }
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const hideLoading = showLoading(submitBtn, '가입 중...');
-            
-            try {
-                const userData = { name, email, password };
-                const success = await registerUser(userData);
-                if (success) {
-                    showLogin();
-                }
-            } catch (error) {
-                handleAPIError(error, '회원가입에 실패했습니다.');
-            } finally {
-                hideLoading();
-            }
-        });
-
-        // User management functions
-        function showUserInfo() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content" style="text-align: center;">
-                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <div style="padding: 2rem;">
-                        <i class="fas fa-user-circle" style="font-size: 4rem; color: #3498db; margin-bottom: 1rem;"></i>
-                        <h2>${currentUser.name}님</h2>
-                        <p style="color: #666; margin-bottom: 2rem;">${currentUser.email}</p>
-                        <div style="display: flex; gap: 1rem; justify-content: center;">
-                            <button class="cta-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">확인</button>
-                            <button class="cta-btn" style="background: #e74c3c;" onclick="logout()">로그아웃</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function logout() {
-            currentUser = null;
-            cart = [];
-            updateCartBadge();
-            updateHeaderButtons();
-            document.querySelectorAll('.modal').forEach(modal => modal.remove());
-            alert('로그아웃되었습니다.');
-        }
-
-        function updateHeaderButtons() {
-            const loginBtn = document.getElementById('loginBtn');
-            const addProductBtn = document.getElementById('addProductBtn');
-            const adminBtn = document.getElementById('adminBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-
-            if (currentUser) {
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                
-                if (currentUser.role === 'admin') {
-                    addProductBtn.style.display = 'block';
-                    adminBtn.style.display = 'block';
-                } else {
-                    addProductBtn.style.display = 'none';
-                    adminBtn.style.display = 'none';
-                }
-            } else {
-                loginBtn.style.display = 'block';
-                addProductBtn.style.display = 'none';
-                adminBtn.style.display = 'none';
-                logoutBtn.style.display = 'none';
-            }
-        }
-
-        // Modal functions
-        function showSignup() {
-            document.getElementById('loginContent').style.display = 'none';
-            document.getElementById('signupContent').style.display = 'block';
-            
-            // 회원가입 폼 초기화
-            document.getElementById('signupForm').reset();
-        }
-
-        function showLogin() {
-            document.getElementById('signupContent').style.display = 'none';
-            document.getElementById('loginContent').style.display = 'block';
-            
-            // 로그인 폼 초기화
-            document.getElementById('loginForm').reset();
-        }
-
-        // Admin panel functions
-        function showAdminPanel() {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('관리자만 접근할 수 있습니다.');
-                return;
-            }
-            document.getElementById('adminModal').style.display = 'block';
-            showPendingUsers();
-        }
-
-        function closeAdminPanel() {
-            document.getElementById('adminModal').style.display = 'none';
-        }
-
-        function showPendingUsers() {
-            const adminContent = document.getElementById('adminContent');
-            const pendingCount = document.getElementById('pendingCount');
-            
-            pendingCount.textContent = pendingUsers.length;
-            
-            if (pendingUsers.length === 0) {
-                adminContent.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">대기중인 회원이 없습니다.</p>';
-                return;
-            }
-
-            adminContent.innerHTML = `
-                <h3>대기중인 회원 목록</h3>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    ${pendingUsers.map(user => `
-                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h4>${user.name}</h4>
-                                <p style="color: #666; font-size: 0.9rem;">${user.email}</p>
-                                <p style="color: #666; font-size: 0.8rem;">가입일: ${user.joinDate}</p>
-                            </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button class="cta-btn" style="background: #27ae60; padding: 0.5rem 1rem;" onclick="approveUser(${user.id})">승인</button>
-                                <button class="cta-btn" style="background: #e74c3c; padding: 0.5rem 1rem;" onclick="rejectUser(${user.id})">거부</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function showAllUsers() {
-            const adminContent = document.getElementById('adminContent');
-            const allUsers = users.filter(user => user.status === 'approved');
-            
-            adminContent.innerHTML = `
-                <h3>전체 회원 목록</h3>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    ${allUsers.map(user => `
-                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin: 1rem 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4>${user.name} ${user.role === 'admin' ? '(관리자)' : ''}</h4>
-                                    <p style="color: #666; font-size: 0.9rem;">${user.email}</p>
-                                    <p style="color: #666; font-size: 0.8rem;">가입일: ${user.joinDate}</p>
-                                </div>
-                                <div>
-                                    <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">승인됨</span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        // Admin Orders Management
-        function showAdminOrders() {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('관리자만 접근할 수 있습니다.');
-                return;
-            }
-            const adminContent = document.getElementById('adminContent');
-            const uniqueUsers = [...new Set(orders.map(o => o.userName))];
-            adminContent.innerHTML = `
-                <h3>주문 관리</h3>
-                <div style="display:flex; gap:0.5rem; flex-wrap: wrap; margin: 0.5rem 0 1rem;">
-                    <input id="adminOrderSearch" placeholder="주문번호/상품명/고객명 검색" style="flex:1; padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
-                    <select id="adminOrderStatusFilter" style="padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
-                        <option value="">상태 전체</option>
-                        ${ORDER_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
-                    </select>
-                    <select id="adminOrderUserFilter" style="padding:0.6rem; border:1px solid #ddd; border-radius:8px;">
-                        <option value="">고객 전체</option>
-                        ${uniqueUsers.map(u=>`<option value="${u}">${u}</option>`).join('')}
-                    </select>
-                    <button class="cta-btn" style="background:#7f8c8d;" onclick="renderAdminOrdersTable()">검색</button>
-                </div>
-                <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
-                    <label style="display:flex; align-items:center; gap:0.4rem;">
-                        <input type="checkbox" id="adminOrdersSelectAll" onchange="toggleSelectAllOrders(this.checked)"> 전체선택
-                    </label>
-                    <select id="adminBulkStatus" style="padding:0.4rem; border:1px solid #ddd; border-radius:6px;">
-                        <option value="">상태 선택</option>
-                        ${ORDER_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
-                    </select>
-                    <button class="cta-btn" style="background:#27ae60; padding:0.5rem 1rem;" onclick="applyBulkStatus()">일괄 변경</button>
-                </div>
-                <div id="adminOrdersTable"></div>
-            `;
-            renderAdminOrdersTable();
-        }
-
-        function getAdminOrderFilters() {
-            const q = document.getElementById('adminOrderSearch')?.value?.trim().toLowerCase() || '';
-            const status = document.getElementById('adminOrderStatusFilter')?.value || '';
-            const user = document.getElementById('adminOrderUserFilter')?.value || '';
-            return { q, status, user };
-        }
-
-        function renderAdminOrdersTable() {
-            const container = document.getElementById('adminOrdersTable');
-            if (!container) return;
-            const { q, status, user } = getAdminOrderFilters();
-            let filtered = [...orders];
-            if (q) {
-                filtered = filtered.filter(o => (
-                    o.orderNumber.toLowerCase().includes(q) ||
-                    o.userName.toLowerCase().includes(q) ||
-                    o.items.some(it => (`${it.brand} ${it.name}`).toLowerCase().includes(q))
-                ));
-            }
-            if (status) filtered = filtered.filter(o => o.status === status);
-            if (user) filtered = filtered.filter(o => o.userName === user);
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#666; padding:1rem;">주문이 없습니다.</p>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(o => `
-                <div style="border:1px solid #ddd; border-radius:10px; padding:1rem; margin:0.5rem 0;">
-                    <div style="display:flex; justify-content:space-between; gap:0.5rem; align-items:center;">
-                        <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <input type="checkbox" class="adminOrderCheckbox" data-ordernum="${o.orderNumber}">
-                            <div>
-                                <div style="font-weight:600;">${o.orderNumber}</div>
-                                <div style="color:#666; font-size:0.9rem;">${o.date} · ${o.userName}</div>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <select onchange="adminUpdateOrderStatus('${o.orderNumber}', this.value)" style="padding:0.3rem; border-radius:6px; border:1px solid #ccc;">
-                                ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
-                            </select>
-                            <button class="cta-btn" style="background:#2c3e50; padding:0.4rem 0.8rem;" onclick="reDownloadOrderPdf('${o.orderNumber}')">PDF</button>
-                        </div>
-                    </div>
-                    <div style="margin-top:0.6rem;">
-                        ${o.items.map(it => `
-                            <div style=\"display:flex; justify-content:space-between; color:#444;\">
-                                <span>${it.brand} ${it.name} x ${it.quantity}</span>
-                                <span>${(it.price * it.quantity).toLocaleString()}원</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div style="text-align:right; font-weight:600; margin-top:0.4rem; color:#e74c3c;">총 ${o.total.toLocaleString()}원</div>
-                </div>
-            `).join('');
-        }
-
-        function toggleSelectAllOrders(checked) {
-            document.querySelectorAll('.adminOrderCheckbox').forEach(cb => { cb.checked = checked; });
-        }
-
-        function applyBulkStatus() {
-            const status = document.getElementById('adminBulkStatus').value;
-            if (!status) { alert('변경할 상태를 선택하세요.'); return; }
-            const selected = Array.from(document.querySelectorAll('.adminOrderCheckbox:checked')).map(cb => cb.getAttribute('data-ordernum'));
-            if (selected.length === 0) { alert('선택된 주문이 없습니다.'); return; }
-            selected.forEach(ordNum => adminUpdateOrderStatus(ordNum, status, { silent: true }));
-            persistOrders();
-            renderAdminOrdersTable();
-            alert(`총 ${selected.length}건의 주문 상태가 '${status}'로 변경되었습니다.`);
-        }
-
-        function adminUpdateOrderStatus(orderNumber, nextStatus, options = {}) {
-            const order = orders.find(o => o.orderNumber === orderNumber);
-            if (!order) return;
-            if (!ORDER_STATUSES.includes(nextStatus)) { alert('유효하지 않은 상태입니다.'); return; }
-            order.status = nextStatus;
-            persistOrders();
-            if (!options.silent) {
-                // 화면 갱신 (주문내역 모달이 열린 경우를 대비)
-                if (document.getElementById('orderHistoryContent')) {
-                    document.querySelectorAll('.modal').forEach(m => m.remove());
-                    showOrderHistory();
-                }
-                if (document.getElementById('adminOrdersTable')) {
-                    renderAdminOrdersTable();
-                }
-            }
-        }
-
-        function approveUser(userId) {
-            const userIndex = pendingUsers.findIndex(user => user.id === userId);
-            if (userIndex !== -1) {
-                const user = pendingUsers[userIndex];
-                // 사용자 데이터를 완전히 복사하여 승인된 상태로 추가
-                const approvedUser = {
-                    ...user,
-                    status: 'approved'
-                };
-                users.push(approvedUser);
-                pendingUsers.splice(userIndex, 1);
-                showPendingUsers();
-                alert(`${user.name}님의 가입이 승인되었습니다.`);
-                console.log('승인된 사용자:', approvedUser); // 디버깅용
-            }
-        }
-
-        function rejectUser(userId) {
-            const userIndex = pendingUsers.findIndex(user => user.id === userId);
-            if (userIndex !== -1) {
-                const user = pendingUsers[userIndex];
-                pendingUsers.splice(userIndex, 1);
-                showPendingUsers();
-                alert(`${user.name}님의 가입이 거부되었습니다.`);
-            }
-        }
-
-        // API functions (mock implementations)
-        async function loginUser(email, password) {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // 디버깅용 로그
-            console.log('로그인 시도:', email);
-            console.log('현재 users:', users);
-            console.log('현재 pendingUsers:', pendingUsers);
-            
-            // users에서만 찾기 (자동 승인으로 pendingUsers 불필요)
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            console.log('찾은 사용자:', user);
-            
-            if (user) {
-                currentUser = user;
-                updateHeaderButtons();
-                alert(`${user.name}님, 환영합니다!`);
-                return true;
-            } else {
-                throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
-            }
-        }
-
-        async function registerUser(userData) {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const existingUser = users.find(u => u.email === userData.email);
-            
-            if (existingUser) {
-                throw new Error('이미 가입된 이메일입니다.');
-            }
-            
-            const newUser = {
-                id: Date.now(),
-                ...userData,
-                role: 'user',
-                status: 'approved', // 자동 승인
-                joinDate: new Date().toLocaleDateString('ko-KR')
-            };
-            
-            users.push(newUser); // 바로 승인된 사용자 목록에 추가
-            persistUsers(); // localStorage에 사용자 데이터 저장
-            alert('회원가입이 완료되었습니다. 바로 로그인할 수 있습니다.');
-            return true;
-        }
-
-        async function addProduct(productData, images) {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            const newProduct = {
-                id: Date.now(),
-                ...productData,
-                category: getCategoryName(productData.category_id)
-            };
-            
-            products.push(newProduct);
-            displayProducts();
-            alert('상품이 성공적으로 등록되었습니다.');
-            return true;
-        }
-
-        function getCategoryName(categoryId) {
-            const categories = {
-                1: '패션',
-                2: '전자제품', 
-                3: '뷰티',
-                4: '홈&리빙'
-            };
-            return categories[categoryId] || '기타';
-        }
-
-        // Utility functions
-        function showLoading(button, text) {
-            const originalText = button.textContent;
-            button.textContent = text;
-            button.disabled = true;
-            
-            return function hideLoading() {
-                button.textContent = originalText;
-                button.disabled = false;
-            };
-        }
-
-        function handleAPIError(error, defaultMessage) {
-            console.error('API Error:', error);
-            alert(error.message || defaultMessage);
-        }
-
-        // Orders persistence (localStorage)
-        function persistOrders() {
-            try {
-                localStorage.setItem('orders', JSON.stringify(orders));
-            } catch (_) {}
-        }
-
-        function loadOrders() {
-            try {
-                const saved = localStorage.getItem('orders');
-                if (saved) {
-                    orders = JSON.parse(saved);
-                }
-            } catch (_) {}
-        }
-
-        // Users persistence (localStorage)
-        function persistUsers() {
-            try {
-                localStorage.setItem('users', JSON.stringify(users));
-            } catch (_) {}
-        }
-
-        function loadUsers() {
-            try {
-                const saved = localStorage.getItem('users');
-                if (saved) {
-                    users = JSON.parse(saved);
-                }
-            } catch (_) {}
-        }
+        // localStorage functions removed - now using Supabase
 
         // PDF generation using jsPDF
         // Ensure Korean font is fetched and cached (register per-document)
@@ -1824,143 +2133,15 @@
             doc.save(filename);
         }
 
-        function reDownloadOrderPdf(orderNumber) {
-            const order = orders.find(o => o.orderNumber === orderNumber);
-            if (!order) { alert('주문을 찾을 수 없습니다.'); return; }
-            generateAndOfferOrderPdf(order);
-        }
+        // reDownloadOrderPdf function removed - now using Supabase
 
-        // EmailJS 설정 및 이메일 발송
-        const EMAILJS_CONFIG = {
-            serviceId: 'service_3n75a2d', // EmailJS 서비스 ID (service_ 중복 제거)
-            templateId: 'template_jkppj0x', // EmailJS 템플릿 ID
-            publicKey: 'ZLGf9XHeyqgjOUOIK' // EmailJS 퍼블릭 키
-        };
+        // EmailJS 설정은 config.js에서 관리됨
 
-        // EmailJS 초기화
-        function initEmailJS() {
-            if (typeof emailjs !== 'undefined') {
-                emailjs.init(EMAILJS_CONFIG.publicKey);
-                console.log('EmailJS 초기화 완료');
-            } else {
-                console.warn('EmailJS가 로드되지 않았습니다.');
-            }
-        }
+        // notifyBusinessNewOrder function removed - now using Supabase
 
-        // 이메일 발송 함수
-        async function sendOrderNotificationEmail(order) {
-            if (typeof emailjs === 'undefined') {
-                console.warn('EmailJS가 로드되지 않았습니다.');
-                return false;
-            }
+        // Categories removed - now using Supabase
 
-            try {
-                // 주문한 사용자의 이메일 주소 찾기
-                const customerEmail = currentUser ? currentUser.email : 'unknown@example.com';
-                
-                // 이메일 템플릿 변수 준비 (주문한 사용자 이메일로 발송)
-                const templateParams = {
-                    to_email: customerEmail, // 주문한 사용자의 이메일
-                    order_number: order.orderNumber,
-                    order_date: order.date,
-                    customer_name: order.userName,
-                    order_items: order.items.map(item => 
-                        `${item.brand} ${item.name} x ${item.quantity}개 - ${(item.price * item.quantity).toLocaleString()}원`
-                    ).join('\n'),
-                    total_amount: order.total.toLocaleString(),
-                    order_time: new Date().toLocaleString('ko-KR')
-                };
-
-                // 디버깅을 위한 로그
-                console.log('EmailJS 설정:', EMAILJS_CONFIG);
-                console.log('템플릿 변수:', templateParams);
-                console.log('발송 대상 이메일:', customerEmail);
-                
-                // 이메일 발송
-                const response = await emailjs.send(
-                    EMAILJS_CONFIG.serviceId,
-                    EMAILJS_CONFIG.templateId,
-                    templateParams
-                );
-
-                console.log('이메일 발송 성공:', response);
-                return true;
-            } catch (error) {
-                console.error('이메일 발송 실패:', error);
-                return false;
-            }
-        }
-
-        // 기존 알림 함수를 이메일 발송으로 변경
-        function notifyBusinessNewOrder(order) {
-            sendOrderNotificationEmail(order).then(success => {
-                if (success) {
-                    console.log('주문 알림 이메일이 발송되었습니다.');
-                } else {
-                    console.warn('주문 알림 이메일 발송에 실패했습니다.');
-                }
-            });
-        }
-
-        // Initialize categories for product form
-        const categories = [
-            { id: 1, name: '패션' },
-            { id: 2, name: '전자제품' },
-            { id: 3, name: '뷰티' },
-            { id: 4, name: '홈&리빙' }
-        ];
-
-        // Check login status on page load
-        function checkLoginStatus() {
-            // Check if user is logged in from localStorage
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                updateHeaderButtons();
-                // 로그인된 상태라면 상품 목록을 재렌더링하여 버튼 활성화
-                displayProducts();
-            }
-        }
-
-        // Save user to localStorage when logged in
-        function saveUserToStorage() {
-            if (currentUser) {
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            } else {
-                localStorage.removeItem('currentUser');
-            }
-        }
-
-        // Override login function to save to localStorage
-        const originalLoginUser = loginUser;
-        loginUser = async function(email, password) {
-            const result = await originalLoginUser(email, password);
-            if (result) {
-                saveUserToStorage();
-                // 로그인 직후 상품 카드의 버튼 상태 반영
-                displayProducts();
-            }
-            return result;
-        };
-
-        // Override logout function to clear localStorage
-        const originalLogout = logout;
-        logout = function() {
-            originalLogout();
-            saveUserToStorage();
-            // 로그아웃 직후 상품 카드의 버튼 상태 반영
-            displayProducts();
-        };
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProducts();
-            loadUsers(); // 사용자 데이터 불러오기
-            updateCartBadge();
-            checkLoginStatus();
-            loadOrders();
-            initEmailJS(); // EmailJS 초기화
-        });
+        // localStorage functions removed - now using Supabase
 
         // Add CSS animation for notifications
         const style = document.createElement('style');
@@ -1989,5 +2170,32 @@
         `;
         document.head.appendChild(style);
     </script>
+
+    <!-- 주문내역 모달 -->
+    <div id="orderHistoryModal" class="modal">
+        <div class="modal-content order-history-content">
+            <span class="close" onclick="closeOrderHistory()">&times;</span>
+            <h2>나의 주문 내역</h2>
+            
+            <div class="order-filters">
+                <select id="orderStatusFilter">
+                    <option value="">전체 상태</option>
+                    <option value="주문접수">주문접수</option>
+                    <option value="처리중">처리중</option>
+                    <option value="배송중">배송중</option>
+                    <option value="완료">완료</option>
+                    <option value="취소">취소</option>
+                </select>
+                <input type="date" id="orderDateFrom" placeholder="시작일">
+                <input type="date" id="orderDateTo" placeholder="종료일">
+                <button onclick="filterOrders()" class="btn btn-primary">필터 적용</button>
+                <button onclick="resetOrderFilters()" class="btn btn-secondary">초기화</button>
+            </div>
+            
+            <div id="orderHistoryList">
+                <!-- 주문 내역이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
