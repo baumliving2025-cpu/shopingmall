@@ -424,7 +424,7 @@ class ExcelUploader {
                 price: productData.productPrice,
                 category: productData.productCategory,
                 description: productData.productDescription,
-                image_url: productData.productImageUrl,
+                image_urls: productData.productImageUrl ? [productData.productImageUrl] : [],
                 stock: productData.productStock,
                 discount: productData.productDiscount,
                 created_at: new Date().toISOString()
