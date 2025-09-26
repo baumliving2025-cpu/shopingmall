@@ -37,3 +37,6 @@ SELECT
 FROM pg_tables 
 WHERE tablename = 'site_settings';
 
+
+
+

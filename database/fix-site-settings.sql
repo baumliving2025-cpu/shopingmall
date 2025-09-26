@@ -41,3 +41,6 @@ ON CONFLICT (setting_key) DO NOTHING;
 SELECT 'site_settings 테이블이 성공적으로 재생성되었습니다.' as message;
 SELECT * FROM site_settings ORDER BY setting_key;
 
+
+
+

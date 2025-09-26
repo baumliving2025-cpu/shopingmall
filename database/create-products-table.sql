@@ -28,3 +28,6 @@ INSERT INTO products (name, brand, price, category, description, image_urls, sto
 SELECT 'products 테이블이 성공적으로 생성되었습니다.' as message;
 SELECT COUNT(*) as product_count FROM products;
 
+
+
+

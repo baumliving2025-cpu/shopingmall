@@ -1,9 +1,8 @@
-// 환경 설정 파일 (GitHub Pages용)
+// 환경 설정 파일 (Vercel + GitHub Pages 호환)
 const CONFIG = {
-    // Supabase 설정 (실제 값으로 변경 필요)
-    // 실제 Supabase 설정 값 (사용자가 제공한 값으로 변경됨)
-    SUPABASE_URL: 'https://fifcrjnfiguuzizferpu.supabase.co', // 사용자가 제공한 Project URL
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZmNyam5maWd1dXppemZlcnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MDMxOTUsImV4cCI6MjA3MjQ3OTE5NX0.7RSw5A5ijNQ9uP-AtkBuLgZ1fNtaIAQ7H5hXoUBArA0', // 사용자가 제공한 anon public 키
+    // Supabase 설정 (환경변수 우선, 없으면 기본값 사용)
+    SUPABASE_URL: typeof process !== 'undefined' && process.env ? process.env.SUPABASE_URL : 'https://fifcrjnfiguuzizferpu.supabase.co',
+    SUPABASE_ANON_KEY: typeof process !== 'undefined' && process.env ? process.env.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZmNyam5maWd1dXppemZlcnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MDMxOTUsImV4cCI6MjA3MjQ3OTE5NX0.7RSw5A5ijNQ9uP-AtkBuLgZ1fNtaIAQ7H5hXoUBArA0',
     
     // EmailJS 설정 (백업용)
     EMAILJS: {

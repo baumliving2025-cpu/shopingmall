@@ -37,3 +37,6 @@ ORDER BY role, status;
 -- 완료 메시지
 SELECT '관리자 계정 설정 가이드 완료' as message;
 
+
+
+

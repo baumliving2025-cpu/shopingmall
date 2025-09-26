@@ -13,3 +13,6 @@ WHERE email = 'wjdrnsdl24@gmail.com';
 -- 결과 메시지
 SELECT 'wjdrnsdl24@gmail.com 계정에 관리자 권한이 부여되었습니다!' as message;
 
+
+
+

@@ -38,3 +38,6 @@ ORDER BY tablename;
 -- 완료 메시지
 SELECT 'RLS 완전 비활성화 완료 - 무한 재귀 오류 해결' as message;
 
+
+
+

@@ -21,3 +21,6 @@ INSERT INTO public.products (name, brand, price, description, category, images, 
 -- 3. 테스트용 일반 사용자 (승인 대기 상태)
 -- 주의: 실제 사용자는 회원가입을 통해 생성됨
 
+
+
+

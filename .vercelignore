@@ -1,0 +1,35 @@
+# 개발 파일들
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# 데이터베이스 파일들
+database/
+*.sql
+
+# 설정 파일들 (환경변수로 대체)
+.env
+.env.local
+
+# Git 관련
+.git/
+.gitignore
+
+# IDE 관련
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (정적 사이트이므로 불필요)
+node_modules/
+package.json
+package-lock.json
+
+# 기타
+README.md
+SETUP_GUIDE.md
+
+
+

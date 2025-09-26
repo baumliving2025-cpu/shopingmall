@@ -1357,7 +1357,10 @@ function showAdminTab(tabName) {
                     }
                     break;
                 case 'settings':
-                    loadSiteSettings();
+                    // 새로운 사이트 설정 시스템 사용
+                    if (window.siteSettingsManager) {
+                        window.siteSettingsManager.loadSettings();
+                    }
                     break;
             }
         } else {
@@ -2628,7 +2631,8 @@ window.testSiteSettings = testSiteSettings;
 
 // ==================== 사이트 설정 기능 ====================
 
-// 사이트 설정 폼 이벤트 리스너 등록
+// 사이트 설정 폼 이벤트 리스너 등록 (새로운 site-settings.js에서 처리됨)
+/*
 document.addEventListener('DOMContentLoaded', function() {
     // 고객센터 정보 폼 이벤트 리스너
     const customerServiceForm = document.getElementById('customerServiceForm');
@@ -2639,7 +2643,7 @@ document.addEventListener('DOMContentLoaded', function() {
             await saveCustomerServiceSettings(formData);
         });
     }
-    
+
     // 회사 정보 폼 이벤트 리스너
     const companyInfoForm = document.getElementById('companyInfoForm');
     if (companyInfoForm) {
@@ -2650,6 +2654,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+*/
 
 // 사이트 설정 로드
 async function loadSiteSettings() {

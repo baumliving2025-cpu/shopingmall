@@ -17,3 +17,6 @@ ALTER TABLE users ALTER COLUMN status SET DEFAULT 'pending';
 -- 5. 관리자 계정은 'active' 상태로 유지 (필요시)
 -- UPDATE users SET status = 'active' WHERE role = 'admin';
 
+
+
+

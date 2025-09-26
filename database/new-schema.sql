@@ -106,3 +106,6 @@ CREATE TRIGGER update_cart_items_updated_at
 -- 완료 메시지
 SELECT '새로운 데이터베이스 스키마 생성 완료' as message;
 
+
+
+

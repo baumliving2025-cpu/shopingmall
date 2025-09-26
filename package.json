@@ -1,0 +1,16 @@
+{
+  "name": "modernshop",
+  "version": "1.0.0",
+  "description": "ModernShop - 프리미엄 쇼핑몰",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "start": "echo 'Static site - no start needed'"
+  },
+  "keywords": ["shopping", "ecommerce", "static"],
+  "author": "ModernShop",
+  "license": "MIT"
+}
+
+
+

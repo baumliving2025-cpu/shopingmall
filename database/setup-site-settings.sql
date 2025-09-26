@@ -39,3 +39,6 @@ CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(setting_key);
 SELECT 'site_settings 테이블이 성공적으로 생성되었습니다.' as message;
 SELECT * FROM site_settings ORDER BY setting_key;
 
+
+
+
