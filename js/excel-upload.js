@@ -10,6 +10,7 @@ class ExcelUploader {
             success: [],
             failed: []
         };
+        this.tableSchema = undefined; // 런타임에 감지
 
         this.initializeEventListeners();
     }
@@ -416,9 +417,28 @@ class ExcelUploader {
             throw new Error('Supabase 클라이언트가 초기화되지 않았습니다.');
         }
 
-        const { data, error } = await window.supabase
-            .from('products')
-            .insert([{
+        // 테이블 스키마 감지를 위한 빈 select 쿼리 (첫 번째 업로드 시에만)
+        if (this.tableSchema === undefined) {
+            await this.detectTableSchema();
+        }
+
+        // 스키마에 맞는 데이터 객체 생성
+        let productRecord;
+
+        if (this.tableSchema === 'supabase') {
+            // supabase-schema.sql 형태 (images, stock_quantity)
+            productRecord = {
+                name: productData.productName,
+                brand: productData.productBrand,
+                price: productData.productPrice,
+                category: productData.productCategory,
+                description: productData.productDescription,
+                images: productData.productImageUrl ? [productData.productImageUrl] : [],
+                stock_quantity: productData.productStock
+            };
+        } else {
+            // create-products-table.sql 형태 (image_urls, stock, discount)
+            productRecord = {
                 name: productData.productName,
                 brand: productData.productBrand,
                 price: productData.productPrice,
@@ -426,15 +446,115 @@ class ExcelUploader {
                 description: productData.productDescription,
                 image_urls: productData.productImageUrl ? [productData.productImageUrl] : [],
                 stock: productData.productStock,
-                discount: productData.productDiscount,
-                created_at: new Date().toISOString()
-            }]);
+                discount: productData.productDiscount
+            };
+        }
+
+        const { data, error } = await window.supabase
+            .from('products')
+            .insert([productRecord]);
 
         if (error) {
             throw new Error(error.message);
         }
 
         return data;
+    }
+
+    async detectTableSchema() {
+        try {
+            // 테이블의 첫 번째 레코드를 가져와서 컬럼 구조 확인
+            const { data, error } = await window.supabase
+                .from('products')
+                .select('*')
+                .limit(1);
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            if (data && data.length > 0) {
+                const firstRecord = data[0];
+                // images 컬럼이 있으면 supabase 스키마, image_urls가 있으면 create-products 스키마
+                if ('images' in firstRecord) {
+                    this.tableSchema = 'supabase';
+                } else if ('image_urls' in firstRecord) {
+                    this.tableSchema = 'create-products';
+                } else {
+                    this.tableSchema = 'create-products'; // 기본값
+                }
+            } else {
+                // 테이블이 비어있는 경우, 임시 레코드 삽입으로 스키마 감지
+                await this.detectSchemaByInsertion();
+            }
+        } catch (error) {
+            console.warn('스키마 감지 실패, 기본 스키마 사용:', error);
+            this.tableSchema = 'create-products';
+        }
+    }
+
+    async detectSchemaByInsertion() {
+        // supabase 스키마 먼저 시도
+        try {
+            const testRecord = {
+                name: 'test',
+                brand: 'test',
+                price: 1,
+                category: '패션',
+                description: 'test',
+                images: [],
+                stock_quantity: 0
+            };
+
+            const { error } = await window.supabase
+                .from('products')
+                .insert([testRecord]);
+
+            if (!error) {
+                this.tableSchema = 'supabase';
+                // 테스트 레코드 삭제
+                await window.supabase
+                    .from('products')
+                    .delete()
+                    .eq('name', 'test')
+                    .eq('brand', 'test');
+                return;
+            }
+        } catch (e) {
+            // supabase 스키마 실패
+        }
+
+        // create-products 스키마 시도
+        try {
+            const testRecord = {
+                name: 'test',
+                brand: 'test',
+                price: 1,
+                category: '패션',
+                description: 'test',
+                image_urls: [],
+                stock: 0,
+                discount: 0
+            };
+
+            const { error } = await window.supabase
+                .from('products')
+                .insert([testRecord]);
+
+            if (!error) {
+                this.tableSchema = 'create-products';
+                // 테스트 레코드 삭제
+                await window.supabase
+                    .from('products')
+                    .delete()
+                    .eq('name', 'test')
+                    .eq('brand', 'test');
+                return;
+            }
+        } catch (e) {
+            // 둘 다 실패하면 기본값
+            this.tableSchema = 'create-products';
+        }
     }
 
     resetUploadState() {
