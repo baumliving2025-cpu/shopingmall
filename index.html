@@ -15,6 +15,7 @@
     <script src="js/supabase-app.js"></script>
     <script src="js/excel-upload.js"></script>
     <script src="js/site-settings.js"></script>
+    <script src="js/receipt-generator.js"></script>
     <style>
         * {
             margin: 0;
@@ -2839,6 +2840,12 @@
                 <input type="date" id="orderDateTo" placeholder="종료일">
                 <button onclick="filterOrders()" class="btn btn-primary">필터 적용</button>
                 <button onclick="resetOrderFilters()" class="btn btn-secondary">초기화</button>
+
+                <div style="margin-left: auto;">
+                    <button onclick="downloadAllReceipts()" class="btn btn-success" style="margin-left: 10px;">
+                        <i class="fas fa-download"></i> 전체 영수증 다운로드
+                    </button>
+                </div>
             </div>
             
             <div id="orderHistoryList">

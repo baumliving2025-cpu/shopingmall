@@ -1035,6 +1035,10 @@ async function loadUserOrderHistory() {
         }
         
         console.log('조회된 주문 수:', orders ? orders.length : 0);
+
+        // 전역 변수에 주문 데이터 저장 (영수증 생성용)
+        window.currentUserOrders = orders || [];
+
         displayOrderHistory(orders || []);
         
     } catch (error) {
@@ -1116,7 +1120,10 @@ function displayOrderHistory(orders) {
                 
                 <div class="order-actions">
                     <button onclick="viewOrderDetail('${order.id}')" class="btn-secondary">상세보기</button>
-                    ${order.status === '주문접수' ? 
+                    <button onclick="downloadReceipt('${order.id}')" class="btn-primary" style="margin-left: 5px;">
+                        <i class="fas fa-download"></i> 영수증
+                    </button>
+                    ${order.status === '주문접수' ?
                         `<button onclick="cancelOrder('${order.id}')" class="btn-danger">주문취소</button>` : ''}
                 </div>
             </div>

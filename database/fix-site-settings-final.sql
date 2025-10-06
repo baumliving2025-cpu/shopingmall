@@ -36,6 +36,8 @@ INSERT INTO site_settings (setting_key, setting_value, created_at, updated_at) V
 ('company_address', '서울특별시 강남구 테헤란로 123, 10층', NOW(), NOW()),
 ('telecom_license', '2024-서울강남-01234', NOW(), NOW()),
 ('business_number', '123-45-67890', NOW(), NOW()),
+('business_type', '전자상거래', NOW(), NOW()),
+('business_category', '온라인쇼핑몰', NOW(), NOW()),
 ('company_website', 'https://modernshop.com', NOW(), NOW()),
 ('company_description', '프리미엄 온라인 쇼핑몰', NOW(), NOW()),
 
