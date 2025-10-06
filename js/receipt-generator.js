@@ -47,131 +47,135 @@ class ReceiptGenerator {
     async generateSingleReceipt(order) {
         await this.loadSiteSettings(); // 최신 설정 로드
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // 한글 폰트 설정 (기본 폰트로 대체)
-        doc.setFont('helvetica');
-
-        // 제목
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('거래명세서(영수증)', 105, 30, { align: 'center' });
-
-        // 선 그리기
-        doc.setLineWidth(0.5);
-        doc.line(20, 35, 190, 35);
-
-        // 공급자 정보
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text('[ 공급자 정보 ]', 20, 50);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        let yPos = 60;
-
-        doc.text(`사업자번호: ${this.siteSettings.business_number || '123-45-67890'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`상호(법인명): ${this.siteSettings.company_name || 'ModernShop'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`대표자명: ${this.siteSettings.company_ceo || '홍길동'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`주소: ${this.siteSettings.company_address || '서울특별시 강남구 테헤란로 123, 10층'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`업태: ${this.siteSettings.business_type || '전자상거래'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`종목: ${this.siteSettings.business_category || '온라인쇼핑몰'}`, 20, yPos);
-
-        // 주문자 정보
-        yPos += 15;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text('[ 주문자 정보 ]', 20, yPos);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        yPos += 10;
-
-        // 주문자 정보 로드
+        // 주문자 정보 및 주문 상품 로드
         const buyerInfo = await this.getBuyerInfo(order.user_id);
-
-        doc.text(`주문자명: ${buyerInfo.name || '고객'}`, 20, yPos);
-        yPos += 8;
-        doc.text(`주문번호: ${order.order_number}`, 20, yPos);
-        yPos += 8;
-        doc.text(`주문일시: ${this.formatDate(order.created_at)}`, 20, yPos);
-        yPos += 8;
-        doc.text(`결제금액: ${this.formatPrice(order.total_amount)}원`, 20, yPos);
-
-        // 상품 정보
-        yPos += 15;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text('[ 상품 정보 ]', 20, yPos);
-
-        // 테이블 헤더
-        yPos += 10;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.text('상품명', 20, yPos);
-        doc.text('수량', 100, yPos);
-        doc.text('단가', 130, yPos);
-        doc.text('금액', 160, yPos);
-
-        // 선 그리기
-        yPos += 3;
-        doc.setLineWidth(0.3);
-        doc.line(20, yPos, 190, yPos);
-
-        // 상품 목록
-        yPos += 10;
-        doc.setFont('helvetica', 'normal');
-
         const orderItems = await this.getOrderItems(order.id);
-        let totalAmount = 0;
 
-        for (const item of orderItems) {
+        // HTML 템플릿 생성
+        const receiptHtml = this.createReceiptHTML(order, buyerInfo, orderItems);
+
+        // 임시 div 생성하여 HTML 렌더링
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = receiptHtml;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '210mm'; // A4 너비
+        tempDiv.style.backgroundColor = 'white';
+        document.body.appendChild(tempDiv);
+
+        try {
+            // HTML을 캔버스로 변환
+            const canvas = await html2canvas(tempDiv, {
+                scale: 2, // 고해상도
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                width: 794, // A4 너비 (픽셀)
+                height: 1123 // A4 높이 (픽셀)
+            });
+
+            // PDF 생성
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210; // A4 너비 (mm)
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+            // 파일명 생성
+            const fileName = `거래명세서_${order.order_number}_${this.formatDateForFile(order.created_at)}.pdf`;
+
+            // PDF 다운로드
+            pdf.save(fileName);
+
+        } finally {
+            // 임시 div 제거
+            document.body.removeChild(tempDiv);
+        }
+    }
+
+    // 영수증 HTML 템플릿 생성
+    createReceiptHTML(order, buyerInfo, orderItems) {
+        let totalAmount = 0;
+        const itemsHtml = orderItems.map(item => {
             const itemTotal = item.price * item.quantity;
             totalAmount += itemTotal;
+            return `
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.product_name}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${this.formatPrice(item.price)}원</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${this.formatPrice(itemTotal)}원</td>
+                </tr>
+            `;
+        }).join('');
 
-            doc.text(this.truncateText(item.product_name, 25), 20, yPos);
-            doc.text(item.quantity.toString(), 100, yPos);
-            doc.text(this.formatPrice(item.price), 130, yPos);
-            doc.text(this.formatPrice(itemTotal), 160, yPos);
-            yPos += 8;
+        return `
+            <div style="font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif; padding: 30px; background: white; max-width: 794px; margin: 0 auto;">
+                <!-- 제목 -->
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #333;">거래명세서(영수증)</h1>
+                    <div style="width: 100%; height: 2px; background: #333; margin: 10px 0;"></div>
+                </div>
 
-            // 페이지 넘김 체크
-            if (yPos > 270) {
-                doc.addPage();
-                yPos = 30;
-            }
-        }
+                <!-- 공급자 정보 -->
+                <div style="margin-bottom: 25px;">
+                    <h2 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; border-bottom: 2px solid #4a90e2; padding-bottom: 5px;">[ 공급자 정보 ]</h2>
+                    <div style="font-size: 14px; line-height: 1.6;">
+                        <div><strong>사업자번호:</strong> ${this.siteSettings.business_number || '123-45-67890'}</div>
+                        <div><strong>상호(법인명):</strong> ${this.siteSettings.company_name || 'ModernShop'}</div>
+                        <div><strong>대표자명:</strong> ${this.siteSettings.company_ceo || '홍길동'}</div>
+                        <div><strong>주소:</strong> ${this.siteSettings.company_address || '서울특별시 강남구 테헤란로 123, 10층'}</div>
+                        <div><strong>업태:</strong> ${this.siteSettings.business_type || '전자상거래'}</div>
+                        <div><strong>종목:</strong> ${this.siteSettings.business_category || '온라인쇼핑몰'}</div>
+                    </div>
+                </div>
 
-        // 총액
-        yPos += 5;
-        doc.setLineWidth(0.3);
-        doc.line(130, yPos, 190, yPos);
-        yPos += 10;
-        doc.setFont('helvetica', 'bold');
-        doc.text('총 금액:', 130, yPos);
-        doc.text(`${this.formatPrice(totalAmount)}원`, 160, yPos);
+                <!-- 주문자 정보 -->
+                <div style="margin-bottom: 25px;">
+                    <h2 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; border-bottom: 2px solid #4a90e2; padding-bottom: 5px;">[ 주문자 정보 ]</h2>
+                    <div style="font-size: 14px; line-height: 1.6;">
+                        <div><strong>주문자명:</strong> ${buyerInfo.name || '고객'}</div>
+                        <div><strong>주문번호:</strong> ${order.order_number}</div>
+                        <div><strong>주문일시:</strong> ${this.formatDate(order.created_at)}</div>
+                        <div><strong>결제금액:</strong> ${this.formatPrice(order.total_amount)}원</div>
+                    </div>
+                </div>
 
-        // 하단 정보
-        yPos += 20;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.text('※ 본 거래명세서는 세금계산서가 아닙니다.', 20, yPos);
-        yPos += 6;
-        doc.text(`문의전화: ${this.siteSettings.customer_phone || '1588-0000'}`, 20, yPos);
-        yPos += 6;
-        doc.text(`발행일: ${this.formatDate(new Date())}`, 20, yPos);
+                <!-- 상품 정보 -->
+                <div style="margin-bottom: 25px;">
+                    <h2 style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; border-bottom: 2px solid #4a90e2; padding-bottom: 5px;">[ 상품 정보 ]</h2>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: left; font-weight: bold;">상품명</th>
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; width: 80px;">수량</th>
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: right; font-weight: bold; width: 100px;">단가</th>
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: right; font-weight: bold; width: 120px;">금액</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                <td colspan="3" style="padding: 12px; border: 1px solid #ddd; text-align: right;">총 금액:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #e74c3c; font-size: 16px;">${this.formatPrice(totalAmount)}원</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-        // 파일명 생성
-        const fileName = `거래명세서_${order.order_number}_${this.formatDateForFile(order.created_at)}.pdf`;
-
-        // PDF 다운로드
-        doc.save(fileName);
+                <!-- 하단 정보 -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
+                    <div style="margin-bottom: 5px;">※ 본 거래명세서는 세금계산서가 아닙니다.</div>
+                    <div style="margin-bottom: 5px;">문의전화: ${this.siteSettings.customer_phone || '1588-0000'}</div>
+                    <div>발행일: ${this.formatDate(new Date())}</div>
+                </div>
+            </div>
+        `;
     }
 
     // 주문자 정보 조회
@@ -245,8 +249,8 @@ class ReceiptGenerator {
                 // 각 주문의 영수증 생성
                 await this.generateSingleReceipt(order);
 
-                // 잠시 대기 (브라우저 부하 방지)
-                await this.delay(500);
+                // 잠시 대기 (브라우저 부하 방지 및 html2canvas 안정화)
+                await this.delay(1000);
             }
 
             // 완료 메시지
